@@ -13,11 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SmartDrive – Automatische Wochenplanung per WhatsApp",
+  title: "SmartDrive",
   description:
     "SmartDrive sammelt Verfügbarkeiten, erstellt den optimalen Wochenplan (Schüler, Fahrlehrer, Standort, Schaltung/Automatik) und versendet Termine automatisch per WhatsApp.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [{ url: "/favicon-v2.svg", type: "image/svg+xml" }],
+    shortcut: ["/favicon-v2.svg"],
   },
 };
 
