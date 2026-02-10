@@ -1,3 +1,4 @@
+// src/app/components/Carousel.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -11,7 +12,6 @@ const logos: Logo[] = [
   { src: "/Logos_Fahrschulen/Fahrschule4.png", alt: "Logo 04" },
   { src: "/Logos_Fahrschulen/Fahrschule5.png", alt: "Logo 05" },
   { src: "/Logos_Fahrschulen/Fahrschule7.png", alt: "Logo 07" },
-
   { src: "/Logos_Fahrschulen/Fahrschule9.png", alt: "Logo 09" },
   { src: "/Logos_Fahrschulen/Fahrschule10.png", alt: "Logo 10" },
 ];
@@ -27,7 +27,7 @@ export default function Carousel() {
 
           <div className="overflow-hidden">
             <motion.div
-              className="flex items-center  min-w-max"
+              className="flex items-center min-w-max"
               animate={{ x: ["0%", "-50%"] }}
               transition={{
                 duration: 45,
@@ -50,8 +50,11 @@ export default function Carousel() {
                   <img
                     src={logo.src}
                     alt={logo.alt}
-                    loading="lazy"
+                    loading="eager"
+                    decoding="sync"
+                    fetchPriority="high"
                     className="max-h-full max-w-full object-contain"
+                    draggable={false}
                   />
                 </div>
               ))}
