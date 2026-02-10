@@ -1,16 +1,7 @@
+// src/app/layout.tsx
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import BackgroundLayer from "./components/BackgroundLayer";
 
 export const metadata: Metadata = {
   title: "SmartDrive",
@@ -29,7 +20,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className="antialiased min-h-screen overflow-x-hidden">
+        <BackgroundLayer />
         {children}
       </body>
     </html>
