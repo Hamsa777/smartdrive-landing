@@ -103,7 +103,7 @@ export default function Contact() {
                 </a>
 
                 <p className="mt-4 text-xs text-slate-400">
-                  Erster Monat kostenlos.
+                  Monatlich kündbar.
                 </p>
               </div>
             </div>

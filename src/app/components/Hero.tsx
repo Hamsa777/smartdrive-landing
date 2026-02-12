@@ -180,7 +180,7 @@ export default function Hero() {
               "
             >
               <span className="flex items-center gap-3 px-7 sm:px-8 py-2.5 sm:py-3 rounded-full bg-[#020617] text-sm sm:text-base font-semibold text-white">
-                Jetzt Automatisieren
+                Jetzt automatisieren
               </span>
             </motion.a>
 
