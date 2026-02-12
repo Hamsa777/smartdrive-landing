@@ -1,7 +1,7 @@
 "use client";
 
 // src/app/components/Hero.tsx
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   FaClock,
   FaSlidersH,
@@ -11,18 +11,84 @@ import {
 } from "react-icons/fa";
 
 export default function Hero() {
-  return (
-    <section id="top" className="relative pt-16 sm:pt-20 pb-14 px-6 sm:px-8">
-<div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-  <div className="absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_18%,black_78%,transparent_100%)]">
-    <div className="absolute inset-0 opacity-60 bg-[linear-gradient(to_right,rgba(56,189,248,0.10)_1px,transparent_1px),linear-gradient(to_bottom,rgba(56,189,248,0.10)_1px,transparent_1px)] bg-[size:46px_46px]" />
-    <div className="absolute inset-y-0 left-0 w-[32vw] max-w-[520px] bg-gradient-to-r from-slate-950/60 via-slate-950/20 to-transparent" />
-    <div className="absolute inset-y-0 right-0 w-[32vw] max-w-[520px] bg-gradient-to-l from-slate-950/60 via-slate-950/20 to-transparent" />
-    <div className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.14),transparent_55%)]" />
-  </div>
-</div>
+  const reduceMotion = useReducedMotion();
 
-      <div className="mx-auto max-w-7xl">
+  const pathAnim1 = reduceMotion
+    ? { pathLength: 1, opacity: 1 }
+    : { pathLength: [0, 1], opacity: [0, 1] };
+
+  const pathAnim2 = reduceMotion
+    ? { pathLength: 1, opacity: 1 }
+    : { pathLength: [0, 1], opacity: [0, 1] };
+
+  return (
+    <section
+      id="top"
+      className="relative pt-14 sm:pt-18 pb-16 px-6 sm:px-8 overflow-hidden"
+    >
+      {/* Background (übernommen: Side-Labels + bewegende Linien) */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 [mask-image:linear-gradient(to_bottom,transparent_0%,black_18%,black_82%,transparent_100%)]">
+        
+          {/* Animierte Linien */}
+          <svg
+            className="absolute inset-0 w-full h-full opacity-25"
+            viewBox="0 0 1200 800"
+            preserveAspectRatio="none"
+          >
+            <motion.path
+              d="M-100 600 Q 150 500 300 650 T 600 400"
+              fill="none"
+              stroke="url(#gradient1)"
+              strokeWidth="2"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={pathAnim1}
+              transition={
+                reduceMotion
+                  ? { duration: 0.8 }
+                  : { duration: 3.2, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }
+              }
+            />
+            <motion.path
+              d="M1300 200 Q 1050 300 900 150 T 600 400"
+              fill="none"
+              stroke="url(#gradient2)"
+              strokeWidth="2"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={pathAnim2}
+              transition={
+                reduceMotion
+                  ? { duration: 0.8 }
+                  : {
+                      duration: 4.2,
+                      delay: 0.8,
+                      repeat: Infinity,
+                      repeatType: "mirror",
+                      ease: "easeInOut",
+                    }
+              }
+            />
+            <defs>
+              <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#4f46e5" />
+                <stop offset="100%" stopColor="#06b6d4" />
+              </linearGradient>
+              <linearGradient id="gradient2" x1="100%" y1="0%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor="#06b6d4" />
+                <stop offset="100%" stopColor="#4f46e5" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          {/* Glows */}
+          <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-indigo-500/13 rounded-full blur-[120px]" />
+          <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-indigo-500/13 rounded-full blur-[120px]" />
+
+        </div>
+        
+      </div>
+
+      <div className="mx-auto max-w-7xl relative">
         <div className="flex flex-col items-center text-center">
           {/* Badge */}
           <motion.div
@@ -31,7 +97,7 @@ export default function Hero() {
             transition={{ duration: 0.6 }}
             className="mb-8 flex justify-center"
           >
-            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-slate-950/80 px-4 py-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-slate-950/80 px-4 py-2 backdrop-blur-md">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
               <span className="text-[0.65rem] tracking-[0.28em] uppercase text-slate-200 font-semibold">
                 SmartDrive · Wir automatisieren Ihre Terminplanung
@@ -39,7 +105,7 @@ export default function Hero() {
             </div>
           </motion.div>
 
-          {/* Headline */}
+          {/* Headline (1 kleiner) */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -84,7 +150,7 @@ export default function Hero() {
               { icon: <FaWhatsapp className="w-6 h-6" />, text: "WhatsApp-Versand" },
             ].map((p) => (
               <div key={p.text} className="flex flex-col items-center text-center gap-2">
-                <span className="text-cyan-200">{p.icon}</span>
+                <span className="text-cyan-300">{p.icon}</span>
                 <span className="text-xs sm:text-sm font-semibold text-slate-100 leading-snug">
                   {p.text}
                 </span>
@@ -92,7 +158,7 @@ export default function Hero() {
             ))}
           </motion.div>
 
-          {/* CTA */}
+          {/* CTA (Hover wie vorher) */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -100,7 +166,7 @@ export default function Hero() {
             className="mt-10 flex flex-wrap justify-center gap-4"
           >
             <motion.a
-              href="#testen"
+              href="/pricing"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               className="
@@ -114,14 +180,14 @@ export default function Hero() {
               "
             >
               <span className="flex items-center gap-3 px-7 sm:px-8 py-2.5 sm:py-3 rounded-full bg-[#020617] text-sm sm:text-base font-semibold text-white">
-                Jetzt kostenlos testen
+                Jetzt Automatisieren
               </span>
             </motion.a>
 
             <motion.a
               href="https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung"
-                target="_blank"
-                rel="noopener noreferrer"
+              target="_blank"
+              rel="noopener noreferrer"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               className="
@@ -141,6 +207,13 @@ export default function Hero() {
           </motion.div>
         </div>
       </div>
+
+      <style jsx>{`
+        .vertical-text {
+          writing-mode: vertical-rl;
+          text-orientation: mixed;
+        }
+      `}</style>
     </section>
   );
 }

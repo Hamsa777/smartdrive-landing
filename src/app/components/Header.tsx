@@ -1,6 +1,6 @@
 // src/app/components/Header.tsx
 "use client";
-
+import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FaComments } from "react-icons/fa";
@@ -46,42 +46,41 @@ export default function Header() {
         />
 
         <div className="mx-auto max-w-7xl px-6 sm:px-8 h-16 flex items-center justify-between">
-          <a href="#top" className="flex items-center gap-3 min-w-0">
-            {/* ICON: groß, nichts abgeschnitten */}
-            <div className="relative h-[280px] w-[280px] shrink-0">
-              <Image
-                src="/testlogo.png"
-                alt="SmartDrive Icon"
-                fill
-                sizes="200px"
-                quality={100}
-                priority
-                className="object-contain scale-[1.12] -translate-y-[-3px]"
-              />
-            </div>
-          </a>
+         <Link href="/" className="flex items-center gap-3 min-w-0">
+  <div className="relative h-[300px] w-[300px] shrink-0">
+    <Image
+      src="/testlogo.png"
+      alt="SmartDrive Icon"
+      fill
+      sizes="200px"
+      quality={100}
+      priority
+      className="object-contain scale-[1.12] translate-y-[5px]"
+    />
+  </div>
+</Link>
+
 
           {/* NAV: alle Links bekommen exakt den Hover */}
           <nav className="hidden md:flex items-center gap-3">
-            <a href="#ablauf" className={headerHoverBtnClass + " px-4 py-2"}>
-              {headerHoverOverlay}
-              <span className="relative z-10">Ablauf</span>
-            </a>
-
-            <a href="#vorteile" className={headerHoverBtnClass + " px-4 py-2"}>
-              {headerHoverOverlay}
-              <span className="relative z-10">Vorteile</span>
-            </a>
+            <a href="/#ablauf" className={headerHoverBtnClass + " px-4 py-2"}>
+  {headerHoverOverlay}
+  <span className="relative z-10">Ablauf</span>
+</a>
+           <a href="/#vorteile" className={headerHoverBtnClass + " px-4 py-2"}>
+  {headerHoverOverlay}
+  <span className="relative z-10">Vorteile</span>
+</a>
 
             <a href="#roi" className={headerHoverBtnClass + " px-4 py-2"}>
               {headerHoverOverlay}
               <span className="relative z-10">ROI-Rechner</span>
             </a>
 
-            <a href="#faq" className={headerHoverBtnClass + " px-4 py-2"}>
-              {headerHoverOverlay}
-              <span className="relative z-10">FAQ</span>
-            </a>
+            <a href="/#faq" className={headerHoverBtnClass + " px-4 py-2"}>
+  {headerHoverOverlay}
+  <span className="relative z-10">FAQ</span>
+</a>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -101,7 +100,7 @@ export default function Header() {
 
             {/* JETZT KOSTENLOS TESTEN: bleibt wie vorher (ausgenommen vom neuen Hover) */}
             <a
-              href="#testen"
+              href="/pricing"
               className={[
                 "relative group inline-flex items-center justify-center rounded-full",
                 "bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] p-[2px]",
@@ -114,7 +113,7 @@ export default function Header() {
               <span className="absolute inset-[2px] rounded-full bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
 
               <span className="relative z-10 flex items-center gap-2 px-5 py-2 rounded-full bg-[#020617] text-sm font-semibold text-white">
-                Jetzt kostenlos testen
+                Jetzt automatisieren
               </span>
             </a>
           </div>
