@@ -1,5 +1,6 @@
 // src/app/components/Header.tsx
 "use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import { FaComments } from "react-icons/fa";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -15,7 +17,25 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Exakt der Hover aus deinem Snippet (Gradient-Overlay erscheint beim Hover)
+  // Menü schließen bei ESC
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  // Scroll lock wenn Menü offen
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   const headerHoverBtnClass =
     "relative group inline-flex items-center justify-center rounded-full " +
     "border border-slate-500/70 bg-slate-900/60 " +
@@ -24,8 +44,15 @@ export default function Header() {
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]";
 
   const headerHoverOverlay = (
-    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
   );
+
+  const burgerBtnClass =
+    "relative group inline-flex items-center justify-center rounded-full " +
+    "border border-slate-500/70 bg-slate-900/60 " +
+    "h-10 w-10 overflow-hidden " +
+    "hover:bg-slate-900/80 transition-colors " +
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]";
 
   return (
     <>
@@ -46,31 +73,50 @@ export default function Header() {
         />
 
         <div className="mx-auto max-w-7xl px-6 sm:px-8 h-16 flex items-center justify-between">
-         <Link href="/" className="flex items-center gap-3 min-w-0">
-  <div className="relative h-[300px] w-[300px] shrink-0">
-    <Image
-      src="/testlogo.png"
-      alt="SmartDrive Icon"
-      fill
-      sizes="200px"
-      quality={100}
-      priority
-      className="object-contain scale-[1.12] translate-y-[5px]"
-    />
-  </div>
-</Link>
+          {/* DESKTOP LOGO */}
+          <Link href="/" className="hidden md:flex items-center gap-3 min-w-0">
+            <div className="relative h-[300px] w-[300px] shrink-0">
+              <Image
+                src="/testlogo.png"
+                alt="SmartDrive Icon"
+                fill
+                sizes="200px"
+                quality={100}
+                priority
+                className="object-contain scale-[1.12] translate-y-[5px]"
+              />
+            </div>
+          </Link>
 
+          {/* MOBILE: Left spacer (für echtes Zentrieren) */}
+          <div className="md:hidden w-10" aria-hidden="true" />
 
-          {/* NAV: alle Links bekommen exakt den Hover */}
+          {/* MOBILE LOGO CENTER */}
+          <Link href="/" className="md:hidden flex items-center justify-center flex-1">
+            <div className="relative h-[44px] w-[160px]">
+              <Image
+                src="/testlogo.png"
+                alt="SmartDrive Icon"
+                fill
+                sizes="160px"
+                quality={100}
+                priority
+                className="object-contain"
+              />
+            </div>
+          </Link>
+
+          {/* DESKTOP NAV */}
           <nav className="hidden md:flex items-center gap-3">
             <a href="/#ablauf" className={headerHoverBtnClass + " px-4 py-2"}>
-  {headerHoverOverlay}
-  <span className="relative z-10">Ablauf</span>
-</a>
-           <a href="/#vorteile" className={headerHoverBtnClass + " px-4 py-2"}>
-  {headerHoverOverlay}
-  <span className="relative z-10">Vorteile</span>
-</a>
+              {headerHoverOverlay}
+              <span className="relative z-10">Ablauf</span>
+            </a>
+
+            <a href="/#vorteile" className={headerHoverBtnClass + " px-4 py-2"}>
+              {headerHoverOverlay}
+              <span className="relative z-10">Vorteile</span>
+            </a>
 
             <a href="#roi" className={headerHoverBtnClass + " px-4 py-2"}>
               {headerHoverOverlay}
@@ -78,18 +124,19 @@ export default function Header() {
             </a>
 
             <a href="/#faq" className={headerHoverBtnClass + " px-4 py-2"}>
-  {headerHoverOverlay}
-  <span className="relative z-10">FAQ</span>
-</a>
+              {headerHoverOverlay}
+              <span className="relative z-10">FAQ</span>
+            </a>
           </nav>
 
+          {/* RIGHT SIDE */}
           <div className="flex items-center gap-3">
-            {/* Kontakt: exakt der Hover */}
+            {/* DESKTOP: Kontakt */}
             <a
               href="https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung"
-                target="_blank"
-                rel="noopener noreferrer"
-              className={"hidden sm:inline-flex " + headerHoverBtnClass + " px-5 py-2"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={"hidden md:inline-flex " + headerHoverBtnClass + " px-5 py-2"}
             >
               {headerHoverOverlay}
               <span className="relative z-10 inline-flex items-center gap-2">
@@ -98,28 +145,143 @@ export default function Header() {
               </span>
             </a>
 
-            {/* JETZT KOSTENLOS TESTEN: bleibt wie vorher (ausgenommen vom neuen Hover) */}
+            {/* DESKTOP: CTA */}
             <a
               href="/pricing"
               className={[
-                "relative group inline-flex items-center justify-center rounded-full",
+                "hidden md:inline-flex relative group items-center justify-center rounded-full",
                 "bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] p-[2px]",
                 "shadow-[0_0_28px_rgba(79,70,229,0.9)] hover:shadow-[0_0_36px_rgba(79,70,229,1)]",
                 "transition-shadow duration-300",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]",
               ].join(" ")}
             >
-              <span className="absolute inset-[2px] rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-25 transition-opacity duration-300" />
-              <span className="absolute inset-[2px] rounded-full bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
+              <span className="pointer-events-none absolute inset-[2px] rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-25 transition-opacity duration-300" />
+              <span className="pointer-events-none absolute inset-[2px] rounded-full bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
 
               <span className="relative z-10 flex items-center gap-2 px-5 py-2 rounded-full bg-[#020617] text-sm font-semibold text-white">
                 Jetzt automatisieren
               </span>
             </a>
+
+            {/* MOBILE: Burger */}
+            <button
+              type="button"
+              aria-label={open ? "Menü schließen" : "Menü öffnen"}
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
+              className={"md:hidden " + burgerBtnClass}
+            >
+              {headerHoverOverlay}
+              <span className="relative z-10 flex flex-col items-center justify-center gap-1">
+                <span
+                  className={[
+                    "block h-[2px] w-5 bg-slate-100 transition-transform duration-200",
+                    open ? "translate-y-[6px] rotate-45" : "",
+                  ].join(" ")}
+                />
+                <span
+                  className={[
+                    "block h-[2px] w-5 bg-slate-100 transition-opacity duration-200",
+                    open ? "opacity-0" : "opacity-100",
+                  ].join(" ")}
+                />
+                <span
+                  className={[
+                    "block h-[2px] w-5 bg-slate-100 transition-transform duration-200",
+                    open ? "-translate-y-[6px] -rotate-45" : "",
+                  ].join(" ")}
+                />
+              </span>
+            </button>
           </div>
         </div>
       </header>
 
+      {/* MOBILE MENU OVERLAY */}
+      <div
+        className={[
+          "md:hidden fixed inset-0 z-[60] transition-opacity duration-200",
+          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+        ].join(" ")}
+      >
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black/55 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
+        />
+
+        {/* Panel */}
+        <div
+          className={[
+            "absolute left-1/2 top-16 -translate-x-1/2 w-[min(92vw,560px)]",
+            "rounded-3xl border border-slate-700/80 bg-slate-950/90 backdrop-blur-xl",
+            "shadow-[0_24px_90px_rgba(0,0,0,0.65)] overflow-hidden",
+            "transition-transform duration-200",
+            open ? "translate-y-0" : "-translate-y-2",
+          ].join(" ")}
+        >
+          {/* Accent line */}
+          <div className="h-px bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-60" />
+
+          <div className="p-4">
+            <div className="grid gap-2">
+              {[
+                { label: "Ablauf", href: "/#ablauf" },
+                { label: "Vorteile", href: "/#vorteile" },
+                { label: "ROI-Rechner", href: "#roi" },
+                { label: "FAQ", href: "/#faq" },
+              ].map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={headerHoverBtnClass + " w-full px-5 py-3 justify-start"}
+                >
+                  {headerHoverOverlay}
+                  <span className="relative z-10">{item.label}</span>
+                </a>
+              ))}
+
+              {/* Kontakt */}
+              <a
+                href="https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className={headerHoverBtnClass + " w-full px-5 py-3 justify-start"}
+              >
+                {headerHoverOverlay}
+                <span className="relative z-10 inline-flex items-center gap-2">
+                  <FaComments className="text-cyan-200" />
+                  Kontakt
+                </span>
+              </a>
+
+              {/* CTA */}
+              <a
+                href="/pricing"
+                onClick={() => setOpen(false)}
+                className={[
+                  "relative group inline-flex items-center justify-center rounded-full w-full",
+                  "bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] p-[2px]",
+                  "shadow-[0_0_28px_rgba(79,70,229,0.9)] hover:shadow-[0_0_36px_rgba(79,70,229,1)]",
+                  "transition-shadow duration-300",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]",
+                ].join(" ")}
+              >
+                <span className="pointer-events-none absolute inset-[2px] rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-25 transition-opacity duration-300" />
+                <span className="pointer-events-none absolute inset-[2px] rounded-full bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
+                <span className="relative z-10 flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#020617] text-sm font-semibold text-white w-full">
+                  Jetzt automatisieren
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Spacer */}
       <div className="h-16" aria-hidden="true" />
     </>
   );

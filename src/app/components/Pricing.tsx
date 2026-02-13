@@ -34,9 +34,9 @@ const plans: Plan[] = [
     name: "SmartDrive Core",
     icon: <FaBolt className="text-cyan-200" />,
     prices: {
-      weekly: 19,
-      monthly: 69,
-      yearly: 799,
+      weekly: 29,
+      monthly: 99,
+      yearly: 1049,
     },
     features: [
       "Automatische Wochenplan-Erstellung",
@@ -53,9 +53,9 @@ const plans: Plan[] = [
     name: "SmartDrive Pro",
     icon: <FaRocket className="text-cyan-200" />,
     prices: {
-      weekly: 25,
-      monthly: 89,
-      yearly: 999,
+      weekly: 39,
+      monthly: 129,
+      yearly: 1299,
     },
     highlight: true,
     features: [
@@ -72,9 +72,9 @@ const plans: Plan[] = [
     name: "SmartDrive Ultimate",
     icon: <FaCrown className="text-cyan-200" />,
     prices: {
-      weekly: 35,
-      monthly: 109,
-      yearly: 1299,
+      weekly: 59,
+      monthly: 159,
+      yearly: 1599,
     },
     features: [
       "Alles aus Pro",
