@@ -80,9 +80,16 @@ export default function Hero() {
             </defs>
           </svg>
 
-          {/* Glows */}
-          <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-indigo-500/13 rounded-full blur-[120px]" />
-          <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-indigo-500/13 rounded-full blur-[120px]" />
+<div
+  aria-hidden
+  className="pointer-events-none absolute inset-0 opacity-90"
+  style={{
+    backgroundImage:
+      "radial-gradient(600px 600px at 0% 50%, rgba(79,70,229,0.20), transparent 64%)," +
+      "radial-gradient(600px 600px at 100% 50%, rgba(79,70,229,0.20), transparent 64%)",
+  }}
+/>
+
 
         </div>
         
