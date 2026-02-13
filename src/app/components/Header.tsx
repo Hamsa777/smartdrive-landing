@@ -56,17 +56,40 @@ export default function Header() {
     <>
       <header
         className={[
-          "fixed inset-x-0 top-0 z-50 h-16 overflow-hidden border-b backdrop-blur-xl transition-all duration-300",
+          "fixed inset-x-0 top-0 z-50 h-16 overflow-visible transition-all duration-300",
           scrolled
-            ? "border-slate-700/70 bg-slate-950/85 shadow-[0_18px_40px_rgba(0,0,0,0.40)]"
-            : "border-slate-800/70 bg-slate-950/55",
+            ? // SCROLLED: klarer Sticky Header
+              "bg-slate-950/85 backdrop-blur-xl shadow-[0_18px_40px_rgba(0,0,0,0.40)]"
+            : // TOP/HERO: wirkt wie Teil vom Hero
+              "bg-transparent backdrop-blur-[2px]",
         ].join(" ")}
       >
-        {/* Accent-Line */}
+        {/* Hero-Blend: weicher Übergang nach unten (verhindert „abgeschnitten“) */}
+        <div
+          className={[
+            "pointer-events-none absolute inset-x-0 top-0 h-full",
+            scrolled ? "opacity-0" : "opacity-100",
+          ].join(" ")}
+        >
+          {/* leichter Glass-Film */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/25 via-slate-950/10 to-transparent" />
+          {/* ganz dezente Bottom-Vignette */}
+          <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-slate-950/10" />
+        </div>
+
+        {/* SCROLLED: Bottom-Glow-Line (nur beim Scrollen) */}
+        <div
+          className={[
+            "pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] transition-opacity duration-300",
+            scrolled ? "opacity-60" : "opacity-0",
+          ].join(" ")}
+        />
+
+        {/* TOP: Accent-Line oben bleibt subtil */}
         <div
           className={[
             "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] transition-opacity duration-300",
-            scrolled ? "opacity-70" : "opacity-25",
+            scrolled ? "opacity-40" : "opacity-20",
           ].join(" ")}
         />
 
@@ -106,7 +129,15 @@ export default function Header() {
 
           {/* DESKTOP NAV (Pill Navbar Layout) */}
           <nav className="hidden md:flex items-center">
-            <div className="relative flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-950/40 p-1 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+            <div
+              className={[
+                "relative flex items-center gap-1 rounded-full p-1 backdrop-blur-xl",
+                // oben: pill wirkt „eingebettet“ in Hero (weniger Border/Schatten)
+                scrolled
+                  ? "border border-slate-700/70 bg-slate-950/45 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                  : "border border-slate-700/40 bg-slate-950/20 shadow-[0_0_0_rgba(0,0,0,0)]",
+              ].join(" ")}
+            >
               {/* Soft glow behind pill */}
               <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593]/20 via-[#4f46e5]/15 to-[#00bcd4]/20 blur-xl opacity-70" />
 
@@ -137,13 +168,12 @@ export default function Header() {
 
           {/* RIGHT SIDE */}
           <div className="flex items-center gap-3">
-            {/* DESKTOP: Kontakt */}
+            {/* DESKTOP: Kontakt (nicht mobile!) */}
             <a
               href="https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung"
               target="_blank"
               rel="noopener noreferrer"
-             className={headerHoverBtnClass + " hidden md:inline-flex px-5 py-2"}
-
+              className={headerHoverBtnClass + " hidden md:inline-flex px-5 py-2"}
             >
               {headerHoverOverlay}
               <span className="relative z-10 inline-flex items-center gap-2">
@@ -204,7 +234,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/* MOBILE MENU OVERLAY */}
+      {/* MOBILE MENU OVERLAY (wie bei dir) */}
       <div
         className={[
           "md:hidden fixed inset-0 z-[60] transition-opacity duration-200",
