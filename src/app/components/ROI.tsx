@@ -124,7 +124,7 @@ export default function ROI() {
         >
           <div className="mb-4 flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-slate-950/80 px-4 py-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
               <span className="text-[0.65rem] tracking-[0.28em] uppercase text-slate-300">
                 ROI-Rechner
               </span>

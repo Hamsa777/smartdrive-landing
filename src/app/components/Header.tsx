@@ -17,7 +17,6 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Menü schließen bei ESC
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -26,7 +25,6 @@ export default function Header() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  // Scroll lock wenn Menü offen
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
@@ -37,7 +35,7 @@ export default function Header() {
   }, [open]);
 
   const headerHoverBtnClass =
-    "relative group inline-flex items-center justify-center rounded-full " +
+    "relative group items-center justify-center rounded-full " +
     "border border-slate-500/70 bg-slate-900/60 " +
     "text-sm font-semibold text-slate-100 " +
     "hover:bg-slate-900/80 transition-colors overflow-hidden " +
@@ -49,7 +47,7 @@ export default function Header() {
 
   const burgerBtnClass =
     "relative group inline-flex items-center justify-center rounded-full " +
-    "border border-slate-500/70 bg-slate-900/60 " +
+    "bg-slate-900/60 " +
     "h-10 w-10 overflow-hidden " +
     "hover:bg-slate-900/80 transition-colors " +
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]";
@@ -73,7 +71,7 @@ export default function Header() {
         />
 
         <div className="mx-auto max-w-7xl px-6 sm:px-8 h-16 flex items-center justify-between">
-          {/* DESKTOP LOGO */}
+          {/* DESKTOP LOGO (exakt wie jetzt) */}
           <Link href="/" className="hidden md:flex items-center gap-3 min-w-0">
             <div className="relative h-[300px] w-[300px] shrink-0">
               <Image
@@ -91,42 +89,50 @@ export default function Header() {
           {/* MOBILE: Left spacer (für echtes Zentrieren) */}
           <div className="md:hidden w-10" aria-hidden="true" />
 
-          {/* MOBILE LOGO CENTER */}
+          {/* MOBILE LOGO CENTER (dein aktueller Block) */}
           <Link href="/" className="md:hidden flex items-center justify-center flex-1">
-            <div className="relative h-[44px] w-[160px]">
+            <div className="relative h-[300px] w-[280px]">
               <Image
                 src="/testlogo.png"
-                alt="SmartDrive Icon"
+                alt="SmartDrive"
                 fill
-                sizes="160px"
+                sizes="240px"
                 quality={100}
                 priority
-                className="object-contain"
+                className="object-contain translate-y-[5px] translate-x-[4px]"
               />
             </div>
           </Link>
 
-          {/* DESKTOP NAV */}
-          <nav className="hidden md:flex items-center gap-3">
-            <a href="/#ablauf" className={headerHoverBtnClass + " px-4 py-2"}>
-              {headerHoverOverlay}
-              <span className="relative z-10">Ablauf</span>
-            </a>
+          {/* DESKTOP NAV (Pill Navbar Layout) */}
+          <nav className="hidden md:flex items-center">
+            <div className="relative flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-950/40 p-1 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
+              {/* Soft glow behind pill */}
+              <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593]/20 via-[#4f46e5]/15 to-[#00bcd4]/20 blur-xl opacity-70" />
 
-            <a href="/#vorteile" className={headerHoverBtnClass + " px-4 py-2"}>
-              {headerHoverOverlay}
-              <span className="relative z-10">Vorteile</span>
-            </a>
-
-            <a href="#roi" className={headerHoverBtnClass + " px-4 py-2"}>
-              {headerHoverOverlay}
-              <span className="relative z-10">ROI-Rechner</span>
-            </a>
-
-            <a href="/#faq" className={headerHoverBtnClass + " px-4 py-2"}>
-              {headerHoverOverlay}
-              <span className="relative z-10">FAQ</span>
-            </a>
+              {[
+                { label: "Ablauf", href: "/#ablauf" },
+                { label: "Vorteile", href: "/#vorteile" },
+                { label: "ROI", href: "#roi" },
+                { label: "FAQ", href: "/#faq" },
+                { label: "Preise", href: "/pricing" },
+              ].map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className={[
+                    "relative group inline-flex items-center justify-center rounded-full",
+                    "px-4 py-2 text-sm font-semibold text-slate-100",
+                    "transition-colors overflow-hidden",
+                    "hover:bg-slate-900/60",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]",
+                  ].join(" ")}
+                >
+                  <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                  <span className="relative z-10">{item.label}</span>
+                </a>
+              ))}
+            </div>
           </nav>
 
           {/* RIGHT SIDE */}
@@ -136,7 +142,8 @@ export default function Header() {
               href="https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung"
               target="_blank"
               rel="noopener noreferrer"
-              className={"hidden md:inline-flex " + headerHoverBtnClass + " px-5 py-2"}
+             className={headerHoverBtnClass + " hidden md:inline-flex px-5 py-2"}
+
             >
               {headerHoverOverlay}
               <span className="relative z-10 inline-flex items-center gap-2">
@@ -158,7 +165,6 @@ export default function Header() {
             >
               <span className="pointer-events-none absolute inset-[2px] rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-25 transition-opacity duration-300" />
               <span className="pointer-events-none absolute inset-[2px] rounded-full bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
-
               <span className="relative z-10 flex items-center gap-2 px-5 py-2 rounded-full bg-[#020617] text-sm font-semibold text-white">
                 Jetzt automatisieren
               </span>
@@ -205,13 +211,8 @@ export default function Header() {
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         ].join(" ")}
       >
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/55 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        />
+        <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={() => setOpen(false)} />
 
-        {/* Panel */}
         <div
           className={[
             "absolute left-1/2 top-16 -translate-x-1/2 w-[min(92vw,560px)]",
@@ -221,7 +222,6 @@ export default function Header() {
             open ? "translate-y-0" : "-translate-y-2",
           ].join(" ")}
         >
-          {/* Accent line */}
           <div className="h-px bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-60" />
 
           <div className="p-4">
@@ -229,27 +229,27 @@ export default function Header() {
               {[
                 { label: "Ablauf", href: "/#ablauf" },
                 { label: "Vorteile", href: "/#vorteile" },
-                { label: "ROI-Rechner", href: "#roi" },
+                { label: "ROI", href: "#roi" },
                 { label: "FAQ", href: "/#faq" },
+                { label: "Preise", href: "/pricing" },
               ].map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className={headerHoverBtnClass + " w-full px-5 py-3 justify-start"}
+                  className={headerHoverBtnClass + " inline-flex w-full px-5 py-3 justify-center text-center"}
                 >
                   {headerHoverOverlay}
                   <span className="relative z-10">{item.label}</span>
                 </a>
               ))}
 
-              {/* Kontakt */}
               <a
                 href="https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
-                className={headerHoverBtnClass + " w-full px-5 py-3 justify-start"}
+                className={headerHoverBtnClass + " inline-flex w-full px-5 py-3 justify-center text-center"}
               >
                 {headerHoverOverlay}
                 <span className="relative z-10 inline-flex items-center gap-2">
@@ -258,7 +258,6 @@ export default function Header() {
                 </span>
               </a>
 
-              {/* CTA */}
               <a
                 href="/pricing"
                 onClick={() => setOpen(false)}
@@ -281,7 +280,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Spacer */}
       <div className="h-16" aria-hidden="true" />
     </>
   );
