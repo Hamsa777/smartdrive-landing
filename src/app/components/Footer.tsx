@@ -7,9 +7,9 @@ export default function Footer() {
           © {new Date().getFullYear()} SmartDrive · Automatisierte Terminplanung für Fahrschulen
         </div>
         <div className="flex items-center gap-5 text-xs text-slate-400">
-          <a href="https://ki-partner24.de/datenschutz"  target="_blank"
+          <a href="/datenschutz" 
           rel="noopener noreferrer" className="hover:text-slate-200 transition-colors">Datenschutz</a>
-          <a href="https://ki-partner24.de/impressum"  target="_blank"
+          <a href="/impressum"
           rel="noopener noreferrer" className="hover:text-slate-200 transition-colors">Impressum</a>
         </div>
       </div>

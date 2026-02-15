@@ -6,8 +6,7 @@ import { FaCheckCircle, FaComments, FaBolt, FaCrown, FaRocket } from "react-icon
 
 const fadeUp = { hidden: { opacity: 0, y: 26 }, visible: { opacity: 1, y: 0 } };
 
-const CAL_LINK =
-  "https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung";
+const CAL_LINK = "https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung";
 
 type Billing = "weekly" | "monthly" | "yearly";
 
@@ -15,13 +14,7 @@ type Plan = {
   key: "A" | "B" | "C";
   name: string;
   icon: React.ReactNode;
-
-  /**
-   * Manuelle Preise pro Abrechnung (pro Fahrlehrer)
-   * -> KEINE Berechnung mehr
-   */
   prices: Record<Billing, number>;
-
   highlight?: boolean;
   features: string[];
   limitations: string[];
@@ -33,66 +26,59 @@ const plans: Plan[] = [
     key: "A",
     name: "SmartDrive Core",
     icon: <FaBolt className="text-cyan-200" />,
-    prices: {
-      weekly: 29,
-      monthly: 99,
-      yearly: 1049,
-    },
+    prices: { weekly: 29, monthly: 99, yearly: 1049 },
     features: [
       "Automatische Wochenplan-Erstellung",
+      "Priorisierung unflexibler Schüler",
+      "Fahrzeug- und Standortwechsel werden minimiert",
       "Max. 2 Termine pro Schüler / Woche",
       "Automatisierter Whatsapp-Versand an Fahrlehrer",
-      "Sperrzeiten für Fahrlehrer definierbar"
-      
+      "Sperrzeiten für Fahrlehrer definierbar",
+      "Liste mit ungeplanten Schülern",
     ],
-    limitations: ["Unbegrenzte Termine pro Schüler / Woche","Automatisierter WhatsApp-Versand an Fahrschüler", "Pausen-Regeln zwischen Fahrstunden"],
-    cta: { label: "Weiter zur Zahlung", href: CAL_LINK, variant: "secondary" },
+    limitations: [
+      "Mehrfache Planberechnung",
+      "Unbegrenzte Termine pro Schüler / Woche",
+      "Automatisierter WhatsApp-Versand an Fahrschüler",
+      "Pausen-Regeln zwischen Fahrstunden",
+      "Planung an Wochenenden",
+      "Begründungen für nicht geplante Schüler",
+    ],
+    cta: { label: "Weiter zur Zahlung", href: "https://buy.stripe.com/4gM7sL4UGbGE9OYacj7bW09", variant: "secondary" },
   },
   {
     key: "B",
     name: "SmartDrive Pro",
     icon: <FaRocket className="text-cyan-200" />,
-    prices: {
-      weekly: 39,
-      monthly: 129,
-      yearly: 1299,
-    },
+    prices: { weekly: 39, monthly: 129, yearly: 1299 },
     highlight: true,
-    features: [
-      "Alles aus Core",
-      "Max. 3 Termine pro Schüler / Woche",
-      "Kurze Pausen zwischen jeder Fahrstunde setzbar",
-      
+    features: ["Alles aus Core", "Max. 3 Termine pro Schüler / Woche", "Pausen zwischen jeder Fahrstunde konfigurierbar", "Planung an Wochenenden möglich"],
+    limitations: [
+      "Mehrfache Planberechnung",
+      "Unbegrenzte Termine pro Schüler / Woche",
+      "Automatisierter WhatsApp-Versand an Fahrschüler",
+      "Begründungen für geplante und nicht geplante Schüler",
     ],
-    limitations: ["Unbegrenzte Termine pro Schüler / Woche","Automatisierter WhatsApp-Versand an Fahrschüler"],
     cta: { label: "Weiter zur Zahlung", href: CAL_LINK, variant: "secondary" },
   },
   {
     key: "C",
     name: "SmartDrive Ultimate",
     icon: <FaCrown className="text-cyan-200" />,
-    prices: {
-      weekly: 59,
-      monthly: 159,
-      yearly: 1599,
-    },
+    prices: { weekly: 59, monthly: 159, yearly: 1599 },
     features: [
       "Alles aus Pro",
+      "Mehrfache Planberechnung und Auswahl des besten Plans",
       "Automatisierter WhatsApp-Versand an alle Fahrschüler",
       "Unbegrenzte Termine pro Schüler / Woche",
+      "Begründungen für geplante und nicht geplante Schüler einsehbar",
     ],
     limitations: [],
     cta: { label: "Weiter zur Zahlung", href: CAL_LINK, variant: "secondary" },
   },
 ];
 
-function PrimaryButton({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+function PrimaryButton({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
@@ -119,13 +105,7 @@ function PrimaryButton({
   );
 }
 
-function SecondaryButton({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+function SecondaryButton({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
@@ -145,6 +125,70 @@ function SecondaryButton({
   );
 }
 
+function SavingsButton({
+  children,
+  onClick,
+  pressed,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  pressed?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        // base
+        "relative inline-flex items-center justify-center rounded-full",
+        "px-3.5 py-1.5",
+        "text-[11px] font-extrabold tracking-[0.22em] uppercase",
+        "border border-slate-700/70 bg-slate-950/60 text-slate-100",
+        "backdrop-blur overflow-hidden",
+        // ONLY hover on the button itself
+        "transition-transform duration-200 ease-out hover:scale-[1.06] active:scale-[0.99]",
+        pressed ? "border-emerald-400/35 text-white" : "",
+      ].join(" ")}
+    >
+      {/* Money transition (nur bei Card-hover, nicht beim Button-hover) */}
+<span
+  aria-hidden
+  className="
+    pointer-events-none absolute inset-0
+    opacity-0 group-hover:opacity-100 transition-opacity duration-300
+    bg-gradient-to-r from-emerald-500/35 via-lime-300/25 to-emerald-500/35
+  "
+/>
+
+{/* Leichter Money shine (Card-hover) */}
+<span
+  aria-hidden
+  className="
+    pointer-events-none absolute inset-0
+    opacity-0 group-hover:opacity-100 transition-opacity duration-300
+    bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.16),transparent_55%)]
+  "
+/>
+
+{/* Premium swoosh (Card-hover) */}
+<span
+  aria-hidden
+  className="
+    pointer-events-none absolute -inset-y-6 -left-1/2 w-[55%]
+    rotate-12
+    opacity-0 group-hover:opacity-100 transition-opacity duration-300
+    bg-gradient-to-r from-transparent via-white/18 to-transparent
+    blur-[0.5px]
+  "
+/>
+
+
+      <span className="relative z-10">{children}</span>
+    </button>
+  );
+}
+
+
 function formatPrice(n: number) {
   return `${n}€`;
 }
@@ -155,21 +199,14 @@ function billingSuffix(billing: Billing) {
   return " / Monat";
 }
 
-function BillingToggle({
-  billing,
-  setBilling,
-}: {
-  billing: Billing;
-  setBilling: (b: Billing) => void;
-}) {
-  const items: { key: Billing; label: string; sub?: string }[] = [
+function BillingToggle({ billing, setBilling }: { billing: Billing; setBilling: (b: Billing) => void }) {
+  const items: { key: Billing; label: string }[] = [
     { key: "weekly", label: "Wöchntl" },
     { key: "monthly", label: "Mntl" },
     { key: "yearly", label: "Jährl" },
   ];
 
   return (
-    // (1) Weniger Luft nach unten: mt-7 -> mt-5, und unnötige Subline-Reserve entfernt
     <div className="mt-5 flex justify-center">
       <div
         className="
@@ -215,7 +252,6 @@ function BillingToggle({
                 active ? "text-white" : "text-slate-200/80 hover:text-slate-100",
               ].join(" ")}
             >
-              {/* (1) Unnötige Sub-Zeile entfernt -> weniger Höhe/Spacing */}
               <div className="flex items-center justify-center leading-none">
                 <span className="tracking-[0.18em] uppercase">{it.label}</span>
               </div>
@@ -230,43 +266,267 @@ function BillingToggle({
 function cancelText(billing: Billing) {
   if (billing === "weekly") return "Wöchentlich kündbar";
   if (billing === "monthly") return "Monatlich kündbar";
-
-  // (4) Jährlich „kündbar“ ist unklar – sinnvoller:
-  // Alternative 1 (Standard): „Jährliche Abrechnung“
-  // Alternative 2: „Laufzeit 12 Monate“
-  // Alternative 3: „Jahresvertrag (12 Monate)“
   return "Jährliche Abrechnung";
 }
 
+/* ============================================================
+   Mini-Sparrechner (Popover)
+   - Kosten: EXAKT prices[period] * Anzahl Fahrlehrer
+   - open ist controlled -> automatisch nur einer offen
+   ============================================================ */
+
+function formatEUR(value: number) {
+  return value.toLocaleString("de-DE", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
+function clamp(n: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, n));
+}
+
+function SmallStepper({
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+}) {
+  return (
+    <div className="flex items-stretch gap-2">
+      <button
+        type="button"
+        onClick={() => onChange(clamp((Number(value) || 0) - step, min, max))}
+        className="w-10 rounded-xl border border-slate-700/80 bg-slate-950/70 text-white hover:bg-slate-900/70 transition-colors"
+        aria-label="Minus"
+      >
+        −
+      </button>
+
+      <div className="relative flex-1 rounded-xl bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] p-[1px]">
+        <input
+          value={value}
+          onChange={(e) => {
+            const n = Number(e.target.value);
+            if (Number.isFinite(n)) onChange(clamp(n, min, max));
+            else onChange(min);
+          }}
+          inputMode="numeric"
+          className="w-full rounded-[0.75rem] bg-[#0b1224] px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none"
+        />
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onChange(clamp((Number(value) || 0) + step, min, max))}
+        className="w-10 rounded-xl border border-slate-700/80 bg-slate-950/70 text-white hover:bg-slate-900/70 transition-colors"
+        aria-label="Plus"
+      >
+        +
+      </button>
+    </div>
+  );
+}
+
+type Period = Billing;
+
+function MiniSavingsPopover({
+  prices,
+  planName,
+  label,
+  open,
+  onOpen,
+  onClose,
+}: {
+  prices: Record<Billing, number>;
+  planName: string; // "SmartDrive Core" etc.
+  label: string;
+  open: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+}) {
+  const [period, setPeriod] = useState<Period>("monthly");
+  const [instructors, setInstructors] = useState<number>(5);
+  const [hoursPerWeekPerInstructor, setHoursPerWeekPerInstructor] = useState<number>(3);
+  const [valuePerHour, setValuePerHour] = useState<number>(80);
+
+  const calc = useMemo(() => {
+    const ins = Math.max(1, instructors);
+    const h = Math.max(0, hoursPerWeekPerInstructor);
+    const v = Math.max(0, valuePerHour);
+
+    const savedHoursWeek = ins * h;
+    const savedHoursMonth = savedHoursWeek * (52 / 12);
+    const savedHoursYear = savedHoursWeek * 52;
+
+    const savedValueWeek = savedHoursWeek * v;
+    const savedValueMonth = savedHoursMonth * v;
+    const savedValueYear = savedHoursYear * v;
+
+    // Kosten EXAKT aus prices (pro Fahrlehrer) * Anzahl Fahrlehrer
+    const cost = (prices[period] || 0) * ins;
+
+    const saved =
+      period === "weekly" ? savedValueWeek : period === "monthly" ? savedValueMonth : savedValueYear;
+
+    return {
+      ins,
+      savedHoursWeek,
+      saved,
+      cost,
+      net: saved - cost,
+    };
+  }, [period, instructors, hoursPerWeekPerInstructor, valuePerHour, prices]);
+
+  return (
+    <div className="relative inline-block">
+      <SavingsButton onClick={() => (open ? onClose() : onOpen())} pressed={open}>
+        {label}
+      </SavingsButton>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-3 w-[340px] sm:w-[380px] z-50">
+          <div className="rounded-3xl p-[1px] bg-gradient-to-br from-cyan-400/30 via-slate-800 to-indigo-500/30 shadow-[0_0_55px_rgba(15,23,42,0.9)]">
+            <div className="relative rounded-3xl bg-[#01040f] backdrop-blur-2xl border border-slate-800/90 overflow-hidden">
+              <div className="absolute inset-x-6 top-0 h-[3px] bg-gradient-to-r from-cyan-400 via-indigo-400 to-sky-500 opacity-70" />
+              <div className="pointer-events-none absolute inset-0 opacity-[0.16] bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.25),transparent_60%),radial-gradient(circle_at_bottom,_rgba(79,70,229,0.25),transparent_60%)]" />
+
+              <div className="relative p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-white font-semibold text-sm">Sparrechner für {planName}</div>
+                    <div className="text-[11px] text-slate-400">Schätzung basierend auf deinen Angaben</div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="text-slate-300 hover:text-white text-sm px-2"
+                    aria-label="Schließen"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {(["weekly", "monthly", "yearly"] as Period[]).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setPeriod(p)}
+                      className={[
+                        "rounded-xl border px-3 py-2 text-xs font-semibold transition-colors",
+                        period === p
+                          ? "border-cyan-400/40 bg-cyan-500/10 text-white"
+                          : "border-slate-700/70 bg-slate-950/50 text-slate-200 hover:bg-slate-900/60",
+                      ].join(" ")}
+                    >
+                      {p === "weekly" ? "Woche" : p === "monthly" ? "Monat" : "Jahr"}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <div className="text-[11px] text-slate-200 mb-1">Anzahl Fahrlehrer</div>
+                    <SmallStepper value={instructors} onChange={setInstructors} min={1} max={60} step={1} />
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-slate-200 mb-1">Planungszeit pro Fahrlehrer / Woche</div>
+                    <SmallStepper
+                      value={hoursPerWeekPerInstructor}
+                      onChange={setHoursPerWeekPerInstructor}
+                      min={0}
+                      max={20}
+                      step={1}
+                    />
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-slate-200 mb-1">Wert pro Stunde (€)</div>
+                    <SmallStepper value={valuePerHour} onChange={setValuePerHour} min={0} max={250} step={5} />
+                    <div className="mt-1 text-[10px] text-slate-500">Tipp: konservativ starten (z.B. 50–70€).</div>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4">
+                  <div className="text-[11px] tracking-[0.22em] uppercase text-emerald-100/90">Ergebnis</div>
+
+                  <div className="mt-2 space-y-1 text-sm">
+                    <div className="flex items-center justify-between text-slate-200">
+                      <span>Ersparnis</span>
+                      <span className="text-white font-semibold">{formatEUR(calc.saved)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-slate-200">
+                      <span>{planName} Kosten</span>
+                      <span className="text-white font-semibold">{formatEUR(calc.cost)}</span>
+                    </div>
+
+                    <div className="mt-2 h-px bg-slate-800/80" />
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-200 font-semibold">Netto-Vorteil</span>
+                      <span className={["font-bold", calc.net >= 0 ? "text-emerald-200" : "text-rose-200"].join(" ")}>
+                        {formatEUR(calc.net)}
+                      </span>
+                    </div>
+
+                    <div className="mt-2 text-[11px] text-slate-400">
+                      Basis: {calc.ins} Fahrlehrer · ~{Math.round(calc.savedHoursWeek)}h Planungszeit/Woche gespart
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3 text-[11px] text-slate-500">
+                  Hinweis: Ergebnis ist eine Schätzung und hängt von Verfügbarkeit & Regeln ab.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ============================================================
+   Pricing
+   ============================================================ */
+
 export default function Pricing() {
   const [billing, setBilling] = useState<Billing>("monthly");
-function roundDiscountPercent(n: number) {
-  // ab 0,5 aufrunden -> Math.round
-  return Math.round(n);
-}
 
-function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
-  if (billing === "weekly") return null;
+  // Nur EIN Popover gleichzeitig offen -> schließt alle anderen automatisch
+  const [openPopoverKey, setOpenPopoverKey] = useState<Plan["key"] | null>(null);
 
-  const weekly = prices.weekly;
-  const chosen = prices[billing];
+  function roundDiscountPercent(n: number) {
+    return Math.round(n);
+  }
 
-  if (!weekly || weekly <= 0 || !chosen || chosen <= 0) return null;
+  function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
+    if (billing === "weekly") return null;
 
-  const yearlyFromWeekly = weekly * 52;
-  const equivalent =
-    billing === "monthly" ? yearlyFromWeekly / 12 : yearlyFromWeekly; // monthly-equivalent bzw yearly-equivalent
+    const weekly = prices.weekly;
+    const chosen = prices[billing];
 
-  // Rabatt in %: (1 - chosen/equivalent) * 100
-  const raw = (1 - chosen / equivalent) * 100;
-  const pct = roundDiscountPercent(raw);
+    if (!weekly || weekly <= 0 || !chosen || chosen <= 0) return null;
 
-  // Nur anzeigen wenn wirklich Rabatt
-  if (pct <= 0) return null;
+    const yearlyFromWeekly = weekly * 52;
+    const equivalent = billing === "monthly" ? yearlyFromWeekly / 12 : yearlyFromWeekly;
 
-  return pct;
-}
+    const raw = (1 - chosen / equivalent) * 100;
+    const pct = roundDiscountPercent(raw);
 
+    if (pct <= 0) return null;
+    return pct;
+  }
 
   const headerNote = useMemo(() => {
     if (billing === "yearly") return "Jährliche Abrechnung pro Fahrlehrer.";
@@ -275,25 +535,23 @@ function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
   }, [billing]);
 
   return (
-   <section
-  id="preise"
-  className="
-    relative py-20 sm:pt-22 sm:py-10 px-6 sm:px-6
-    flex justify-center
-    scroll-mt-[40vh]
-    overflow-hidden
+    <section
+      id="preise"
+      className="
+        relative py-20 sm:pt-22 sm:py-10 px-6 sm:px-6
+        flex justify-center
+        scroll-mt-[40vh]
+        overflow-hidden
 
-    before:content-[''] before:absolute before:inset-0 before:pointer-events-none
-    before:bg-[radial-gradient(560px_560px_at_0%_0%,rgba(79,70,229,0.22),transparent_60%),radial-gradient(560px_560px_at_100%_0%,rgba(56,189,248,0.18),transparent_60%)]
-    before:opacity-90
+        before:content-[''] before:absolute before:inset-0 before:pointer-events-none
+        before:bg-[radial-gradient(560px_560px_at_0%_0%,rgba(79,70,229,0.22),transparent_60%),radial-gradient(560px_560px_at_100%_0%,rgba(56,189,248,0.18),transparent_60%)]
+        before:opacity-90
 
-    after:content-[''] after:absolute after:inset-0 after:pointer-events-none
-    after:bg-[radial-gradient(420px_420px_at_0%_0%,rgba(56,189,248,0.10),transparent_62%),radial-gradient(420px_420px_at_100%_0%,rgba(99,102,241,0.10),transparent_62%)]
-    after:opacity-80
-  "
->
-
-        
+        after:content-[''] after:absolute after:inset-0 after:pointer-events-none
+        after:bg-[radial-gradient(420px_420px_at_0%_0%,rgba(56,189,248,0.10),transparent_62%),radial-gradient(420px_420px_at_100%_0%,rgba(99,102,241,0.10),transparent_62%)]
+        after:opacity-80
+      "
+    >
       <div className="w-full max-w-7xl">
         <motion.div
           variants={fadeUp}
@@ -306,9 +564,7 @@ function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-slate-950/80 px-4 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
-              <span className="text-[0.65rem] tracking-[0.28em] uppercase text-slate-200">
-                Unsere Preise
-              </span>
+              <span className="text-[0.65rem] tracking-[0.28em] uppercase text-slate-200">Unsere Preise</span>
             </div>
           </div>
 
@@ -326,12 +582,14 @@ function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
           <BillingToggle billing={billing} setBilling={setBilling} />
         </motion.div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3 items-stretch">
+        {/* relative + z-index layering fix */}
+        <div className="relative mt-12 grid gap-6 lg:grid-cols-3 items-stretch">
           {plans.map((p, idx) => {
-            // (2) keine Berechnung mehr – rein manuell aus prices
             const price = p.prices[billing];
             const suffix = billingSuffix(billing);
-            const discountPct = discountFromWeekly(p.prices, billing);
+
+            const isOpen = openPopoverKey === p.key;
+
             return (
               <motion.div
                 key={p.key}
@@ -341,7 +599,9 @@ function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
                 viewport={{ once: true, amount: 0.25 }}
                 transition={{ duration: 0.55, delay: idx * 0.04 }}
                 className={[
-                  "relative  group rounded-[1.8rem] border bg-slate-950/80 backdrop-blur-2xl overflow-hidden",
+                  // isolate + z-index: Popover-Card liegt garantiert über Nachbar-Cards
+                  "relative isolate group rounded-[1.8rem] border bg-slate-950/80 backdrop-blur-2xl",
+                  isOpen ? "z-30" : "z-10",
                   p.highlight
                     ? "border-cyan-400/40 shadow-[0_0_40px_rgba(56,189,248,0.18)]"
                     : "border-slate-800/90 shadow-[0_0_45px_rgba(15,23,42,0.85)]",
@@ -352,74 +612,68 @@ function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
 
                 <div className="relative p-6 sm:p-7 flex flex-col h-full">
                   <div className="flex items-start justify-between gap-4">
-                    {/* ICON + NAME (premium, aber clean: kein floating, kein underline, kein name-glow) */}
-<div className="flex items-center gap-3.5 min-w-0">
-  {/* ICON CHIP (gradient ring + glow, ohne motion) */}
-  <div className="relative">
-    {/* outer glow */}
-    <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-gradient-to-r from-indigo-500/22 via-cyan-400/18 to-sky-500/22 blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
+                    {/* ICON + NAME + BUTTON */}
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="relative">
+                        <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-gradient-to-r from-indigo-500/22 via-cyan-400/18 to-sky-500/22 blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
 
-    {/* ring */}
-    <div className="relative rounded-3xl p-[2px] bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4]">
-      <div className="relative w-12 h-12 rounded-3xl bg-[#020617] border border-slate-800/70 flex items-center justify-center shadow-[0_0_22px_rgba(79,70,229,0.28)] group-hover:shadow-[0_0_30px_rgba(56,189,248,0.34)] transition-shadow">
-        {/* inner glow (subtle) */}
-        <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_30%_30%,rgba(56,189,248,0.14),transparent_62%)] opacity-80" />
-        <span className="relative text-cyan-200 text-base">{p.icon}</span>
-      </div>
-    </div>
-  </div>
+                        <div className="relative rounded-3xl p-[2px] bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4]">
+                          <div className="relative w-12 h-12 rounded-3xl bg-[#020617] border border-slate-800/70 flex items-center justify-center shadow-[0_0_22px_rgba(79,70,229,0.28)] group-hover:shadow-[0_0_30px_rgba(56,189,248,0.34)] transition-shadow">
+                            <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_30%_30%,rgba(56,189,248,0.14),transparent_62%)] opacity-80" />
+                            <span className="relative text-cyan-200 text-base">{p.icon}</span>
+                          </div>
+                        </div>
+                      </div>
 
-  {/* NAME (clean, slightly smaller) */}
-  <div className="min-w-0 h-12 flex items-center">
-    <div className="text-sm sm:text-base font-semibold text-white whitespace-nowrap">
-      {p.name}
-    </div>
-  </div>
-</div>
+                      <div className="min-w-0 flex flex-col justify-center">
+                        <div className="text-sm sm:text-base font-semibold text-white whitespace-nowrap">{p.name}</div>
 
-<div className="text-right shrink-0 relative">
-  <div className="text-3xl sm:text-4xl font-bold leading-none">
- <span className="bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity">
-  {formatPrice(price)}
-</span>
+                        <div className="mt-2">
+                          <MiniSavingsPopover
+                            prices={p.prices}
+                            planName={p.name}
+                            label="Ersparnis"
+                            open={isOpen}
+                            onOpen={() => setOpenPopoverKey(p.key)}
+                            onClose={() => setOpenPopoverKey(null)}
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-</div>
+                    {/* PRICE */}
+                    <div className="text-right shrink-0 relative">
+                      <div className="text-3xl sm:text-4xl font-bold leading-none">
+                        <span className="bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity">
+                          {formatPrice(price)}
+                        </span>
+                      </div>
 
+                      <div className="text-xs text-slate-400 mt-2">pro Fahrlehrer{suffix}</div>
 
-  <div className="text-xs text-slate-400 mt-2">
-    pro Fahrlehrer{suffix}
-  </div>
+                      {billing !== "weekly"
+                        ? (() => {
+                            const discountPct = discountFromWeekly(p.prices, billing);
+                            if (discountPct === null) return null;
 
-  {/* Overlay: nimmt keinen Layout-Platz weg */}
-  {billing !== "weekly" ? (() => {
-    const discountPct = discountFromWeekly(p.prices, billing);
-    if (discountPct === null) return null;
+                            const old =
+                              billing === "monthly" ? (p.prices.weekly * 52) / 12 : p.prices.weekly * 52;
 
-    const old =
-      billing === "monthly"
-        ? (p.prices.weekly * 52) / 12
-        : p.prices.weekly * 52;
+                            return (
+                              <div className="absolute right-0 top-full mt-2 z-10 flex items-center gap-2 leading-none">
+                                <div className="relative inline-flex items-center rounded-full border border-emerald-400/30 bg-slate-950/80 backdrop-blur px-2.5 py-1 overflow-hidden">
+                                  <span className="absolute inset-0 bg-gradient-to-r from-emerald-100/10 via-lime-100/10 to-emerald-100/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  <span className="text-[0.65rem] tracking-[0.22em] uppercase bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(163,230,53,0.25)] group-hover:drop-shadow-[0_0_14px_rgba(163,230,53,0.45)] transition-[filter,opacity]">
+                                    -{discountPct}%
+                                  </span>
+                                </div>
 
-    return (
-      <div className="absolute right-0 top-full mt-2 z-10 flex items-center gap-2 leading-none">
-        <div className="relative inline-flex items-center rounded-full border border-emerald-400/30 bg-slate-950/80 backdrop-blur px-2.5 py-1 overflow-hidden">
-  {/* gleiche Money-Gradient-Farbe wie Preis + stärker beim Hover */}
-  <span className="absolute inset-0 bg-gradient-to-r from-emerald-100/10 via-lime-100/10 to-emerald-100/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-  <span className="text-[0.65rem] tracking-[0.22em] uppercase bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(163,230,53,0.25)] group-hover:drop-shadow-[0_0_14px_rgba(163,230,53,0.45)] transition-[filter,opacity]">
-    -{discountPct}%
-  </span>
-</div>
-
-        <span className="text-xs text-slate-400 line-through">
-          {formatPrice(Math.round(old))}
-        </span>
-      </div>
-    );
-  })() : null}
-</div>
-
-
+                                <span className="text-xs text-slate-400 line-through">{formatPrice(Math.round(old))}</span>
+                              </div>
+                            );
+                          })()
+                        : null}
+                    </div>
                   </div>
 
                   <div className="mt-7 flex-1">
@@ -436,10 +690,7 @@ function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
                     <div className="mt-6 text-sm font-semibold text-slate-100">Nicht enthalten</div>
                     <ul className="mt-3 space-y-2.5">
                       {(p.limitations.length > 0 ? p.limitations : ["—"]).map((f, i) => (
-                        <li
-                          key={`${p.key}-lim-${i}`}
-                          className="flex gap-2.5 text-sm text-slate-300/80"
-                        >
+                        <li key={`${p.key}-lim-${i}`} className="flex gap-2.5 text-sm text-slate-300/80">
                           <span className="w-4 h-4 flex-none mt-[3px] inline-flex items-center justify-center">
                             <span className="h-1.5 w-1.5 rounded-full bg-slate-500/80" />
                           </span>
@@ -450,14 +701,12 @@ function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
                   </div>
 
                   <div className="mt-auto pt-7">
-                   {p.cta.variant === "primary" ? (
-  <PrimaryButton href={p.cta.href}>{p.cta.label}</PrimaryButton>
-) : (
-  <SecondaryButton href={p.cta.href}>{p.cta.label}</SecondaryButton>
-)}
+                    {p.cta.variant === "primary" ? (
+                      <PrimaryButton href={p.cta.href}>{p.cta.label}</PrimaryButton>
+                    ) : (
+                      <SecondaryButton href={p.cta.href}>{p.cta.label}</SecondaryButton>
+                    )}
 
-
-                    {/* (4) Dynamischer Text je Auswahl, Free-Month entfernt */}
                     <p className="mt-4 text-xs text-slate-400">{cancelText(billing)}</p>
                   </div>
                 </div>
@@ -466,15 +715,11 @@ function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
           })}
         </div>
 
-<div className="mt-10 flex justify-center">
-         
+        <div className="mt-10 flex justify-center">
+          <div className="w-full max-w-xl rounded-2xl bg-slate-950/70 px-6 py-6 text-center">
+            <div className="text-xs tracking-[0.22em] uppercase text-cyan-300/90">Noch Fragen?</div>
 
-<div className="w-full max-w-xl rounded-2xl  bg-slate-950/70 px-6 py-6 text-center">
-            <div className="text-xs tracking-[0.22em] uppercase text-cyan-300/90">
-                Noch Fragen?
-            </div>
-           
-<div className="mt-5 flex justify-center">
+            <div className="mt-5 flex justify-center">
               <SecondaryButton href={CAL_LINK}>
                 <FaComments className="w-4 h-4 sm:w-5 sm:h-5 opacity-90" />
                 Kostenloses Gespräch buchen

@@ -207,7 +207,7 @@ export default function Hero() {
             >
               <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <span className="relative z-10 inline-flex items-center gap-2">
-                <FaComments className="text-cyan-200" />
+                <FaComments className="text-cyan-300" />
                 Kontakt
               </span>
             </motion.a>

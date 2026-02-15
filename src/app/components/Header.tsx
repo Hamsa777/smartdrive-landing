@@ -177,7 +177,7 @@ export default function Header() {
             >
               {headerHoverOverlay}
               <span className="relative z-10 inline-flex items-center gap-2">
-                <FaComments className="text-cyan-200" />
+                <FaComments className="text-cyan-300" />
                 Kontakt
               </span>
             </a>
@@ -283,7 +283,7 @@ export default function Header() {
               >
                 {headerHoverOverlay}
                 <span className="relative z-10 inline-flex items-center gap-2">
-                  <FaComments className="text-cyan-200" />
+                  <FaComments className="text-cyan-300" />
                   Kontakt
                 </span>
               </a>
