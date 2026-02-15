@@ -716,7 +716,7 @@ export default function Pricing() {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <div className="w-full max-w-xl rounded-2xl bg-slate-950/70 px-6 py-6 text-center">
+          <div className="w-full max-w-xl rounded-2xl  px-6 py-6 text-center">
             <div className="text-xs tracking-[0.22em] uppercase text-cyan-300/90">Noch Fragen?</div>
 
             <div className="mt-5 flex justify-center">
