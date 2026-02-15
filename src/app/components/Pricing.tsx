@@ -572,7 +572,7 @@ export default function Pricing() {
         after:opacity-80
       "
     >
-      <div className="w-full max-w-7xl">
+<div className="w-full max-w-screen-2xl 2xl:max-w-[92rem] mx-auto">
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -596,7 +596,7 @@ export default function Pricing() {
           </h1>
 
           <p className="mt-4 text-sm sm:text-base text-slate-300/90 leading-relaxed">
-            {headerNote} Klare Limits pro Schüler/Woche – damit der Plan stabil bleibt.
+            {headerNote}
           </p>
 
           <BillingToggle billing={billing} setBilling={setBilling} />
@@ -642,7 +642,7 @@ export default function Pricing() {
                       </div>
 
                       <div className="min-w-0 flex flex-col justify-center">
-                        <div className="text-sm sm:text-base font-semibold text-white whitespace-nowrap">{p.name}</div>
+<div className="text-base  mt-0.5 sm:text-lg font-bold text-white whitespace-nowrap">{p.name}</div>
 
                         <div className="mt-2">
                           <MiniSavingsPopover
@@ -690,7 +690,7 @@ export default function Pricing() {
                     </div>
                   </div>
 
-                  <div className="mt-7 flex-1">
+                  <div className="mt-12 flex-1">
                     <div className="text-sm font-semibold text-slate-100">Enthalten</div>
                     <ul className="mt-3 space-y-2.5">
                       {p.features.map((f) => (
