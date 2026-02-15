@@ -106,11 +106,51 @@ export default function Header() {
               />
             </Link>
 
-            {/* MOBILE: Left spacer (für echtes Zentrieren) */}
+            {/* MOBILE: linker Spacer (Breite wie Burger), damit Logo wirklich mittig bleibt */}
             <div className="md:hidden w-10" aria-hidden="true" />
+          </div>
 
-            {/* MOBILE LOGO CENTER */}
-            <Link href="/" className="md:hidden inline-flex items-center justify-center flex-1">
+          {/* CENTER (Desktop: Nav | Mobile: Logo mittig) */}
+          <div className="justify-self-center">
+            {/* DESKTOP NAV */}
+            <nav className="hidden md:flex items-center">
+              <div
+                className={[
+                  "relative flex items-center gap-1 rounded-full p-1 backdrop-blur-xl",
+                  scrolled
+                    ? "border border-slate-700/70 bg-slate-950/45 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                    : "border border-slate-700/40 bg-slate-950/20 shadow-[0_0_0_rgba(0,0,0,0)]",
+                ].join(" ")}
+              >
+                <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593]/20 via-[#4f46e5]/15 to-[#00bcd4]/20 blur-xl opacity-70" />
+
+                {[
+                  { label: "Ablauf", href: "/#ablauf" },
+                  { label: "Vorteile", href: "/#vorteile" },
+                  { label: "ROI", href: "#roi" },
+                  { label: "FAQ", href: "/#faq" },
+                  { label: "Preise", href: "/pricing" },
+                ].map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className={[
+                      "relative group inline-flex items-center justify-center rounded-full",
+                      "px-4 py-2 text-sm font-semibold text-slate-100",
+                      "transition-colors overflow-hidden",
+                      "hover:bg-slate-900/60",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]",
+                    ].join(" ")}
+                  >
+                    <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                    <span className="relative z-10">{item.label}</span>
+                  </a>
+                ))}
+              </div>
+            </nav>
+
+            {/* MOBILE LOGO: exakt mittig */}
+            <Link href="/" className="md:hidden inline-flex items-center justify-center">
               <Image
                 src="/SmartDriveFinal.png"
                 alt="SmartDrive"
@@ -118,47 +158,10 @@ export default function Header() {
                 height={175}
                 priority
                 quality={100}
-                className="h-10 w-auto object-contain"
+                className="h-9 w-auto object-contain translate-y-[2.5px]"
               />
             </Link>
           </div>
-
-          {/* CENTER */}
-          <nav className="hidden md:flex items-center justify-self-center">
-            <div
-              className={[
-                "relative flex items-center gap-1 rounded-full p-1 backdrop-blur-xl",
-                scrolled
-                  ? "border border-slate-700/70 bg-slate-950/45 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-                  : "border border-slate-700/40 bg-slate-950/20 shadow-[0_0_0_rgba(0,0,0,0)]",
-              ].join(" ")}
-            >
-              <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593]/20 via-[#4f46e5]/15 to-[#00bcd4]/20 blur-xl opacity-70" />
-
-              {[
-                { label: "Ablauf", href: "/#ablauf" },
-                { label: "Vorteile", href: "/#vorteile" },
-                { label: "ROI", href: "#roi" },
-                { label: "FAQ", href: "/#faq" },
-                { label: "Preise", href: "/pricing" },
-              ].map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className={[
-                    "relative group inline-flex items-center justify-center rounded-full",
-                    "px-4 py-2 text-sm font-semibold text-slate-100",
-                    "transition-colors overflow-hidden",
-                    "hover:bg-slate-900/60",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]",
-                  ].join(" ")}
-                >
-                  <span className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-                  <span className="relative z-10">{item.label}</span>
-                </a>
-              ))}
-            </div>
-          </nav>
 
           {/* RIGHT */}
           <div className="flex items-center gap-3 justify-self-end">
@@ -194,7 +197,7 @@ export default function Header() {
               </span>
             </a>
 
-            {/* MOBILE: Burger */}
+            {/* MOBILE: Burger ganz rechts */}
             <button
               type="button"
               aria-label={open ? "Menü schließen" : "Menü öffnen"}
@@ -235,10 +238,7 @@ export default function Header() {
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         ].join(" ")}
       >
-        <div
-          className="absolute inset-0 bg-black/55 backdrop-blur-sm"
-          onClick={() => setOpen(false)}
-        />
+        <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={() => setOpen(false)} />
 
         <div
           className={[
@@ -264,7 +264,10 @@ export default function Header() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className={headerHoverBtnClass + " inline-flex w-full px-5 py-3 justify-center text-center"}
+                  className={
+                    headerHoverBtnClass +
+                    " inline-flex w-full px-5 py-3 justify-center text-center"
+                  }
                 >
                   {headerHoverOverlay}
                   <span className="relative z-10">{item.label}</span>
@@ -276,7 +279,10 @@ export default function Header() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
-                className={headerHoverBtnClass + " inline-flex w-full px-5 py-3 justify-center text-center"}
+                className={
+                  headerHoverBtnClass +
+                  " inline-flex w-full px-5 py-3 justify-center text-center"
+                }
               >
                 {headerHoverOverlay}
                 <span className="relative z-10 inline-flex items-center gap-2">
