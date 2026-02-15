@@ -58,26 +58,22 @@ export default function Header() {
         className={[
           "fixed inset-x-0 top-0 z-50 h-16 overflow-visible transition-all duration-300",
           scrolled
-            ? // SCROLLED: klarer Sticky Header
-              "bg-slate-950/85 backdrop-blur-xl shadow-[0_18px_40px_rgba(0,0,0,0.40)]"
-            : // TOP/HERO: wirkt wie Teil vom Hero
-              "bg-transparent backdrop-blur-[2px]",
+            ? "bg-slate-950/85 backdrop-blur-xl shadow-[0_18px_40px_rgba(0,0,0,0.40)]"
+            : "bg-transparent backdrop-blur-[2px]",
         ].join(" ")}
       >
-        {/* Hero-Blend: weicher Übergang nach unten (verhindert „abgeschnitten“) */}
+        {/* Hero-Blend */}
         <div
           className={[
             "pointer-events-none absolute inset-x-0 top-0 h-full",
             scrolled ? "opacity-0" : "opacity-100",
           ].join(" ")}
         >
-          {/* leichter Glass-Film */}
           <div className="absolute inset-0 bg-gradient-to-b from-slate-950/25 via-slate-950/10 to-transparent" />
-          {/* ganz dezente Bottom-Vignette */}
           <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-slate-950/10" />
         </div>
 
-        {/* SCROLLED: Bottom-Glow-Line (nur beim Scrollen) */}
+        {/* Bottom-Glow-Line */}
         <div
           className={[
             "pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] transition-opacity duration-300",
@@ -85,7 +81,7 @@ export default function Header() {
           ].join(" ")}
         />
 
-        {/* TOP: Accent-Line oben bleibt subtil */}
+        {/* Top Accent-Line */}
         <div
           className={[
             "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] transition-opacity duration-300",
@@ -93,52 +89,50 @@ export default function Header() {
           ].join(" ")}
         />
 
-        <div className="mx-auto max-w-7xl px-6 sm:px-8 h-16 flex items-center justify-between">
-          {/* DESKTOP LOGO (exakt wie jetzt) */}
-          <Link href="/" className="hidden md:flex items-center gap-3 min-w-0">
-            <div className="relative h-[300px] w-[300px] shrink-0">
+        {/* GRID: links / mitte / rechts => Navbar exakt zentriert */}
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 h-16 grid grid-cols-[1fr_auto_1fr] items-center">
+          {/* LEFT */}
+          <div className="flex items-center justify-self-start min-w-0">
+            {/* DESKTOP LOGO */}
+            <Link href="/" className="hidden md:inline-flex items-center min-w-0">
               <Image
-                src="/testlogo.png"
-                alt="SmartDrive Icon"
-                fill
-                sizes="200px"
-                quality={100}
-                priority
-                className="object-contain scale-[1.12] translate-y-[5px]"
-              />
-            </div>
-          </Link>
-
-          {/* MOBILE: Left spacer (für echtes Zentrieren) */}
-          <div className="md:hidden w-10" aria-hidden="true" />
-
-          {/* MOBILE LOGO CENTER (dein aktueller Block) */}
-          <Link href="/" className="md:hidden flex items-center justify-center flex-1">
-            <div className="relative h-[300px] w-[280px]">
-              <Image
-                src="/testlogo.png"
+                src="/SmartDriveFinal.png"
                 alt="SmartDrive"
-                fill
-                sizes="240px"
-                quality={100}
+                width={975}
+                height={175}
                 priority
-                className="object-contain translate-y-[5px] translate-x-[4px]"
+                quality={100}
+                className="h-11 w-auto object-contain"
               />
-            </div>
-          </Link>
+            </Link>
 
-          {/* DESKTOP NAV (Pill Navbar Layout) */}
-          <nav className="hidden md:flex items-center">
+            {/* MOBILE: Left spacer (für echtes Zentrieren) */}
+            <div className="md:hidden w-10" aria-hidden="true" />
+
+            {/* MOBILE LOGO CENTER */}
+            <Link href="/" className="md:hidden inline-flex items-center justify-center flex-1">
+              <Image
+                src="/SmartDriveFinal.png"
+                alt="SmartDrive"
+                width={975}
+                height={175}
+                priority
+                quality={100}
+                className="h-10 w-auto object-contain"
+              />
+            </Link>
+          </div>
+
+          {/* CENTER */}
+          <nav className="hidden md:flex items-center justify-self-center">
             <div
               className={[
                 "relative flex items-center gap-1 rounded-full p-1 backdrop-blur-xl",
-                // oben: pill wirkt „eingebettet“ in Hero (weniger Border/Schatten)
                 scrolled
                   ? "border border-slate-700/70 bg-slate-950/45 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
                   : "border border-slate-700/40 bg-slate-950/20 shadow-[0_0_0_rgba(0,0,0,0)]",
               ].join(" ")}
             >
-              {/* Soft glow behind pill */}
               <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-r from-[#283593]/20 via-[#4f46e5]/15 to-[#00bcd4]/20 blur-xl opacity-70" />
 
               {[
@@ -166,9 +160,9 @@ export default function Header() {
             </div>
           </nav>
 
-          {/* RIGHT SIDE */}
-          <div className="flex items-center gap-3">
-            {/* DESKTOP: Kontakt (nicht mobile!) */}
+          {/* RIGHT */}
+          <div className="flex items-center gap-3 justify-self-end">
+            {/* DESKTOP: Kontakt */}
             <a
               href="https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung"
               target="_blank"
@@ -234,14 +228,17 @@ export default function Header() {
         </div>
       </header>
 
-      {/* MOBILE MENU OVERLAY (wie bei dir) */}
+      {/* MOBILE MENU OVERLAY */}
       <div
         className={[
           "md:hidden fixed inset-0 z-[60] transition-opacity duration-200",
           open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
         ].join(" ")}
       >
-        <div className="absolute inset-0 bg-black/55 backdrop-blur-sm" onClick={() => setOpen(false)} />
+        <div
+          className="absolute inset-0 bg-black/55 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
+        />
 
         <div
           className={[

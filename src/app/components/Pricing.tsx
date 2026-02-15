@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { FaCheckCircle, FaComments, FaBolt, FaCrown, FaRocket } from "react-icons/fa";
+import { FaCheckCircle, FaComments, FaBolt, FaCrown, FaRocket, FaCalculator } from "react-icons/fa";
 
 const fadeUp = { hidden: { opacity: 0, y: 26 }, visible: { opacity: 1, y: 0 } };
 
@@ -44,7 +44,11 @@ const plans: Plan[] = [
       "Planung an Wochenenden",
       "Begründungen für nicht geplante Schüler",
     ],
-    cta: { label: "Weiter zur Zahlung", href: "https://buy.stripe.com/4gM7sL4UGbGE9OYacj7bW09", variant: "secondary" },
+    cta: {
+      label: "Weiter zur Zahlung",
+      href: "https://buy.stripe.com/4gM7sL4UGbGE9OYacj7bW09",
+      variant: "secondary",
+    },
   },
   {
     key: "B",
@@ -52,7 +56,12 @@ const plans: Plan[] = [
     icon: <FaRocket className="text-cyan-200" />,
     prices: { weekly: 39, monthly: 129, yearly: 1299 },
     highlight: true,
-    features: ["Alles aus Core", "Max. 3 Termine pro Schüler / Woche", "Pausen zwischen jeder Fahrstunde konfigurierbar", "Planung an Wochenenden möglich"],
+    features: [
+      "Alles aus Core",
+      "Max. 3 Termine pro Schüler / Woche",
+      "Pausen zwischen jeder Fahrstunde konfigurierbar",
+      "Planung an Wochenenden möglich",
+    ],
     limitations: [
       "Mehrfache Planberechnung",
       "Unbegrenzte Termine pro Schüler / Woche",
@@ -125,12 +134,16 @@ function SecondaryButton({ href, children }: { href: string; children: React.Rea
   );
 }
 
+/**
+ * SavingsButton:
+ * - Button selbst: nur Zoom bei Hover
+ * - Money/Glow: wie BillingToggle pill (Card-hover via group-hover)
+ * - Calculator Icon
+ */
 function SavingsButton({
-  children,
   onClick,
   pressed,
 }: {
-  children: React.ReactNode;
   onClick: () => void;
   pressed?: boolean;
 }) {
@@ -139,55 +152,49 @@ function SavingsButton({
       type="button"
       onClick={onClick}
       className={[
-        // base
-        "relative inline-flex items-center justify-center rounded-full",
+        "relative inline-flex items-center justify-center rounded-full overflow-hidden",
         "px-3.5 py-1.5",
         "text-[11px] font-extrabold tracking-[0.22em] uppercase",
-        "border border-slate-700/70 bg-slate-950/60 text-slate-100",
-        "backdrop-blur overflow-hidden",
-        // ONLY hover on the button itself
+        "border border-slate-700/70 bg-slate-950/70 text-slate-100 backdrop-blur",
+        // ONLY button hover: zoom
         "transition-transform duration-200 ease-out hover:scale-[1.06] active:scale-[0.99]",
-        pressed ? "border-emerald-400/35 text-white" : "",
+        // pressed state slightly brighter
+        pressed ? "border-cyan-400/35 text-white" : "",
       ].join(" ")}
     >
-      {/* Money transition (nur bei Card-hover, nicht beim Button-hover) */}
-<span
-  aria-hidden
-  className="
-    pointer-events-none absolute inset-0
-    opacity-0 group-hover:opacity-100 transition-opacity duration-300
-    bg-gradient-to-r from-emerald-500/35 via-lime-300/25 to-emerald-500/35
-  "
-/>
+      {/* Same vibe as BillingToggle pill (Card-hover) */}
+      <span
+        aria-hidden
+        className="
+          pointer-events-none absolute inset-0 opacity-0
+          group-hover:opacity-100 transition-opacity duration-300
+          bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4]
+        "
+      />
+      <span
+        aria-hidden
+        className="
+          pointer-events-none absolute inset-0 opacity-0
+          group-hover:opacity-100 transition-opacity duration-300
+          shadow-[0_0_28px_rgba(79,70,229,0.70)]
+        "
+      />
+      <span
+        aria-hidden
+        className="
+          pointer-events-none absolute inset-0 opacity-0
+          group-hover:opacity-100 transition-opacity duration-300
+          bg-[radial-gradient(ellipse_at_center,rgba(56,189,248,0.12),transparent_55%)]
+        "
+      />
 
-{/* Leichter Money shine (Card-hover) */}
-<span
-  aria-hidden
-  className="
-    pointer-events-none absolute inset-0
-    opacity-0 group-hover:opacity-100 transition-opacity duration-300
-    bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.16),transparent_55%)]
-  "
-/>
-
-{/* Premium swoosh (Card-hover) */}
-<span
-  aria-hidden
-  className="
-    pointer-events-none absolute -inset-y-6 -left-1/2 w-[55%]
-    rotate-12
-    opacity-0 group-hover:opacity-100 transition-opacity duration-300
-    bg-gradient-to-r from-transparent via-white/18 to-transparent
-    blur-[0.5px]
-  "
-/>
-
-
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10 inline-flex items-center gap-2">
+        <span>Ersparnis</span>
+        <FaCalculator className="w-3.5 h-3.5 opacity-90" />
+      </span>
     </button>
   );
 }
-
 
 function formatPrice(n: number) {
   return `${n}€`;
@@ -272,7 +279,7 @@ function cancelText(billing: Billing) {
 /* ============================================================
    Mini-Sparrechner (Popover)
    - Kosten: EXAKT prices[period] * Anzahl Fahrlehrer
-   - open ist controlled -> automatisch nur einer offen
+   - Ersparnis-Faktor: Core 80%, Pro 90%, Ultimate 100%
    ============================================================ */
 
 function formatEUR(value: number) {
@@ -339,25 +346,33 @@ function SmallStepper({
 
 type Period = Billing;
 
+function savingsPercentForPlan(planName: string) {
+  const n = planName.toLowerCase();
+  if (n.includes("core")) return 80;
+  if (n.includes("pro")) return 90;
+  return 100; // Ultimate
+}
+
 function MiniSavingsPopover({
   prices,
   planName,
-  label,
   open,
   onOpen,
   onClose,
 }: {
   prices: Record<Billing, number>;
-  planName: string; // "SmartDrive Core" etc.
-  label: string;
+  planName: string;
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
 }) {
   const [period, setPeriod] = useState<Period>("monthly");
   const [instructors, setInstructors] = useState<number>(5);
-  const [hoursPerWeekPerInstructor, setHoursPerWeekPerInstructor] = useState<number>(3);
+  const [hoursPerWeekPerInstructor, setHoursPerWeekPerInstructor] = useState<number>(2);
   const [valuePerHour, setValuePerHour] = useState<number>(80);
+
+  const percent = savingsPercentForPlan(planName);
+  const factor = percent / 100;
 
   const calc = useMemo(() => {
     const ins = Math.max(1, instructors);
@@ -368,9 +383,14 @@ function MiniSavingsPopover({
     const savedHoursMonth = savedHoursWeek * (52 / 12);
     const savedHoursYear = savedHoursWeek * 52;
 
-    const savedValueWeek = savedHoursWeek * v;
-    const savedValueMonth = savedHoursMonth * v;
-    const savedValueYear = savedHoursYear * v;
+    const baseSavedValueWeek = savedHoursWeek * v;
+    const baseSavedValueMonth = savedHoursMonth * v;
+    const baseSavedValueYear = savedHoursYear * v;
+
+    // Plan-Faktor: Core 80%, Pro 90%, Ultimate 100%
+    const savedValueWeek = baseSavedValueWeek * factor;
+    const savedValueMonth = baseSavedValueMonth * factor;
+    const savedValueYear = baseSavedValueYear * factor;
 
     // Kosten EXAKT aus prices (pro Fahrlehrer) * Anzahl Fahrlehrer
     const cost = (prices[period] || 0) * ins;
@@ -385,13 +405,11 @@ function MiniSavingsPopover({
       cost,
       net: saved - cost,
     };
-  }, [period, instructors, hoursPerWeekPerInstructor, valuePerHour, prices]);
+  }, [period, instructors, hoursPerWeekPerInstructor, valuePerHour, prices, factor]);
 
   return (
     <div className="relative inline-block">
-      <SavingsButton onClick={() => (open ? onClose() : onOpen())} pressed={open}>
-        {label}
-      </SavingsButton>
+      <SavingsButton onClick={() => (open ? onClose() : onOpen())} pressed={open} />
 
       {open && (
         <div className="absolute left-0 top-full mt-3 w-[340px] sm:w-[380px] z-50">
@@ -404,7 +422,7 @@ function MiniSavingsPopover({
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="text-white font-semibold text-sm">Sparrechner für {planName}</div>
-                    <div className="text-[11px] text-slate-400">Schätzung basierend auf deinen Angaben</div>
+                    <div className="text-[11px] text-slate-400">Schätzung basierend auf Ihren Angaben</div>
                   </div>
                   <button
                     type="button"
@@ -461,9 +479,13 @@ function MiniSavingsPopover({
 
                   <div className="mt-2 space-y-1 text-sm">
                     <div className="flex items-center justify-between text-slate-200">
-                      <span>Ersparnis</span>
+                      <span className="inline-flex items-center gap-2">
+                        Ersparnis
+                        <span className="text-[11px] font-semibold text-cyan-200/90">({percent}%)</span>
+                      </span>
                       <span className="text-white font-semibold">{formatEUR(calc.saved)}</span>
                     </div>
+
                     <div className="flex items-center justify-between text-slate-200">
                       <span>{planName} Kosten</span>
                       <span className="text-white font-semibold">{formatEUR(calc.cost)}</span>
@@ -502,8 +524,6 @@ function MiniSavingsPopover({
 
 export default function Pricing() {
   const [billing, setBilling] = useState<Billing>("monthly");
-
-  // Nur EIN Popover gleichzeitig offen -> schließt alle anderen automatisch
   const [openPopoverKey, setOpenPopoverKey] = useState<Plan["key"] | null>(null);
 
   function roundDiscountPercent(n: number) {
@@ -582,12 +602,10 @@ export default function Pricing() {
           <BillingToggle billing={billing} setBilling={setBilling} />
         </motion.div>
 
-        {/* relative + z-index layering fix */}
         <div className="relative mt-12 grid gap-6 lg:grid-cols-3 items-stretch">
           {plans.map((p, idx) => {
             const price = p.prices[billing];
             const suffix = billingSuffix(billing);
-
             const isOpen = openPopoverKey === p.key;
 
             return (
@@ -599,7 +617,6 @@ export default function Pricing() {
                 viewport={{ once: true, amount: 0.25 }}
                 transition={{ duration: 0.55, delay: idx * 0.04 }}
                 className={[
-                  // isolate + z-index: Popover-Card liegt garantiert über Nachbar-Cards
                   "relative isolate group rounded-[1.8rem] border bg-slate-950/80 backdrop-blur-2xl",
                   isOpen ? "z-30" : "z-10",
                   p.highlight
@@ -612,7 +629,6 @@ export default function Pricing() {
 
                 <div className="relative p-6 sm:p-7 flex flex-col h-full">
                   <div className="flex items-start justify-between gap-4">
-                    {/* ICON + NAME + BUTTON */}
                     <div className="flex items-center gap-3.5 min-w-0">
                       <div className="relative">
                         <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-gradient-to-r from-indigo-500/22 via-cyan-400/18 to-sky-500/22 blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
@@ -632,7 +648,6 @@ export default function Pricing() {
                           <MiniSavingsPopover
                             prices={p.prices}
                             planName={p.name}
-                            label="Ersparnis"
                             open={isOpen}
                             onOpen={() => setOpenPopoverKey(p.key)}
                             onClose={() => setOpenPopoverKey(null)}
@@ -641,7 +656,6 @@ export default function Pricing() {
                       </div>
                     </div>
 
-                    {/* PRICE */}
                     <div className="text-right shrink-0 relative">
                       <div className="text-3xl sm:text-4xl font-bold leading-none">
                         <span className="bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity">
@@ -716,7 +730,7 @@ export default function Pricing() {
         </div>
 
         <div className="mt-10 flex justify-center">
-          <div className="w-full max-w-xl rounded-2xl  px-6 py-6 text-center">
+          <div className="w-full max-w-xl rounded-2xl px-6 py-6 text-center">
             <div className="text-xs tracking-[0.22em] uppercase text-cyan-300/90">Noch Fragen?</div>
 
             <div className="mt-5 flex justify-center">

@@ -344,20 +344,18 @@ export default function HowItWorks_Timeline() {
       title: "Erstellung des Wochenplans",
       desc: "Nachdem die Verfügbarkeiten der Fahrschüler und die Blockzeiten der Fahrlehrer im System sind, erstellt SmartDrive vollautomatisch den Wochenplan.",
       icon: <FaCogs className="w-5 h-5" />,
-      mockup: (
-        <div className="mt-5 flex justify-center">
-          {/* fixed slot height (Card bleibt gleich), Logo wird nur visuell skaliert */}
-          <div className="relative h-[64px] sm:h-[78px] w-full overflow-visible">
-            <Image
-              src="/testlogo.png"
-              alt="SmartDrive Logo"
-              fill
-              priority={false}
-              className="object-contain origin-center scale-[3.0] sm:scale-[3.4]"
-            />
-          </div>
-        </div>
-      ),
+     mockup: (
+  <div className="mt-7 flex justify-center">
+    <Image
+      src="/SmartDriveFinal.png"
+      alt="SmartDrive Logo"
+      width={975}
+      height={175}
+      className="h-14 sm:h-16 w-auto object-contain -translate-x-6"
+    />
+  </div>
+),
+
     },
     {
       title: "Wochenplan an Fahrlehrer",
