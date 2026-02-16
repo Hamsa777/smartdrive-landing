@@ -18,7 +18,8 @@ type Plan = {
   highlight?: boolean;
   features: string[];
   limitations: string[];
-  cta: { label: string; href: string; variant: "primary" | "secondary" };
+  // ✅ 3 Zahlungslinks pro Plan (weekly/monthly/yearly)
+  cta: { label: string; hrefs: Record<Billing, string>; variant: "primary" | "secondary" };
 };
 
 const plans: Plan[] = [
@@ -46,7 +47,11 @@ const plans: Plan[] = [
     ],
     cta: {
       label: "Weiter zur Zahlung",
-      href: "https://buy.stripe.com/4gM7sL4UGbGE9OYacj7bW09",
+      hrefs: {
+        weekly: "https://buy.stripe.com/cNi3cv3QC3a87GQ5W37bW0a",
+        monthly: "https://buy.stripe.com/4gM7sL4UGbGE9OYacj7bW09",
+        yearly: "https://buy.stripe.com/cNicN59aW6mk5yIckr7bW0b",
+      },
       variant: "secondary",
     },
   },
@@ -68,7 +73,15 @@ const plans: Plan[] = [
       "Automatisierter WhatsApp-Versand an Fahrschüler",
       "Begründungen für geplante und nicht geplante Schüler",
     ],
-    cta: { label: "Weiter zur Zahlung", href: CAL_LINK, variant: "secondary" },
+    cta: {
+      label: "Weiter zur Zahlung",
+      hrefs: {
+        weekly: "https://buy.stripe.com/5kQ3cv0Eq7qof9ibgn7bW0c",
+        monthly: "https://buy.stripe.com/8x29AT5YKh0YaT2esz7bW0d",
+        yearly: "https://buy.stripe.com/6oU7sLaf09yw7GQbgn7bW0e",
+      },
+      variant: "secondary",
+    },
   },
   {
     key: "C",
@@ -83,7 +96,15 @@ const plans: Plan[] = [
       "Begründungen für geplante und nicht geplante Schüler einsehbar",
     ],
     limitations: [],
-    cta: { label: "Weiter zur Zahlung", href: CAL_LINK, variant: "secondary" },
+    cta: {
+      label: "Weiter zur Zahlung",
+      hrefs: {
+        weekly: "https://buy.stripe.com/aFa5kDaf09yw9OY84b7bW0f",
+        monthly: "https://buy.stripe.com/cNiaEXaf0h0Y5yIesz7bW0g",
+        yearly: "https://buy.stripe.com/4gM7sLfzkh0Y8KU5W37bW0h",
+      },
+      variant: "secondary",
+    },
   },
 ];
 
@@ -134,19 +155,7 @@ function SecondaryButton({ href, children }: { href: string; children: React.Rea
   );
 }
 
-/**
- * SavingsButton:
- * - Button selbst: nur Zoom bei Hover
- * - Money/Glow: wie BillingToggle pill (Card-hover via group-hover)
- * - Calculator Icon
- */
-function SavingsButton({
-  onClick,
-  pressed,
-}: {
-  onClick: () => void;
-  pressed?: boolean;
-}) {
+function SavingsButton({ onClick, pressed }: { onClick: () => void; pressed?: boolean }) {
   return (
     <button
       type="button"
@@ -156,13 +165,10 @@ function SavingsButton({
         "px-3.5 py-1.5",
         "text-[11px] font-extrabold tracking-[0.22em] uppercase",
         "border border-slate-700/70 bg-slate-950/70 text-slate-100 backdrop-blur",
-        // ONLY button hover: zoom
         "transition-transform duration-200 ease-out hover:scale-[1.06] active:scale-[0.99]",
-        // pressed state slightly brighter
         pressed ? "border-cyan-400/35 text-white" : "",
       ].join(" ")}
     >
-      {/* Same vibe as BillingToggle pill (Card-hover) */}
       <span
         aria-hidden
         className="
@@ -278,8 +284,6 @@ function cancelText(billing: Billing) {
 
 /* ============================================================
    Mini-Sparrechner (Popover)
-   - Kosten: EXAKT prices[period] * Anzahl Fahrlehrer
-   - Ersparnis-Faktor: Core 80%, Pro 90%, Ultimate 100%
    ============================================================ */
 
 function formatEUR(value: number) {
@@ -350,7 +354,7 @@ function savingsPercentForPlan(planName: string) {
   const n = planName.toLowerCase();
   if (n.includes("core")) return 80;
   if (n.includes("pro")) return 90;
-  return 100; // Ultimate
+  return 100;
 }
 
 function MiniSavingsPopover({
@@ -387,24 +391,15 @@ function MiniSavingsPopover({
     const baseSavedValueMonth = savedHoursMonth * v;
     const baseSavedValueYear = savedHoursYear * v;
 
-    // Plan-Faktor: Core 80%, Pro 90%, Ultimate 100%
     const savedValueWeek = baseSavedValueWeek * factor;
     const savedValueMonth = baseSavedValueMonth * factor;
     const savedValueYear = baseSavedValueYear * factor;
 
-    // Kosten EXAKT aus prices (pro Fahrlehrer) * Anzahl Fahrlehrer
     const cost = (prices[period] || 0) * ins;
 
-    const saved =
-      period === "weekly" ? savedValueWeek : period === "monthly" ? savedValueMonth : savedValueYear;
+    const saved = period === "weekly" ? savedValueWeek : period === "monthly" ? savedValueMonth : savedValueYear;
 
-    return {
-      ins,
-      savedHoursWeek,
-      saved,
-      cost,
-      net: saved - cost,
-    };
+    return { ins, savedHoursWeek, saved, cost, net: saved - cost };
   }, [period, instructors, hoursPerWeekPerInstructor, valuePerHour, prices, factor]);
 
   return (
@@ -480,8 +475,7 @@ function MiniSavingsPopover({
                   <div className="mt-2 space-y-1 text-sm">
                     <div className="flex items-center justify-between text-slate-200">
                       <span className="inline-flex items-center gap-2">
-                        Ersparnis
-                        <span className="text-[11px] font-semibold text-cyan-200/90">({percent}%)</span>
+                        Ersparnis <span className="text-[11px] font-semibold text-cyan-200/90">({percent}%)</span>
                       </span>
                       <span className="text-white font-semibold">{formatEUR(calc.saved)}</span>
                     </div>
@@ -572,7 +566,7 @@ export default function Pricing() {
         after:opacity-80
       "
     >
-<div className="w-full max-w-screen-2xl 2xl:max-w-[92rem] mx-auto">
+      <div className="w-full max-w-screen-2xl 2xl:max-w-[92rem] mx-auto">
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -595,9 +589,7 @@ export default function Pricing() {
             </span>
           </h1>
 
-          <p className="mt-4 text-sm sm:text-base text-slate-300/90 leading-relaxed">
-            {headerNote}
-          </p>
+          <p className="mt-4 text-sm sm:text-base text-slate-300/90 leading-relaxed">{headerNote}</p>
 
           <BillingToggle billing={billing} setBilling={setBilling} />
         </motion.div>
@@ -607,6 +599,7 @@ export default function Pricing() {
             const price = p.prices[billing];
             const suffix = billingSuffix(billing);
             const isOpen = openPopoverKey === p.key;
+            const payHref = p.cta.hrefs[billing] || p.cta.hrefs.monthly;
 
             return (
               <motion.div
@@ -618,6 +611,7 @@ export default function Pricing() {
                 transition={{ duration: 0.55, delay: idx * 0.04 }}
                 className={[
                   "relative isolate group rounded-[1.8rem] border bg-slate-950/80 backdrop-blur-2xl",
+                  "min-h-[820px] sm:min-h-0",
                   isOpen ? "z-30" : "z-10",
                   p.highlight
                     ? "border-cyan-400/40 shadow-[0_0_40px_rgba(56,189,248,0.18)]"
@@ -628,7 +622,7 @@ export default function Pricing() {
                 <div className="absolute inset-x-8 top-0 h-[3px] bg-gradient-to-r from-cyan-400 via-indigo-400 to-sky-500" />
 
                 <div className="relative p-6 sm:p-7 flex flex-col h-full">
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     <div className="flex items-center gap-3.5 min-w-0">
                       <div className="relative">
                         <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-gradient-to-r from-indigo-500/22 via-cyan-400/18 to-sky-500/22 blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
@@ -642,9 +636,9 @@ export default function Pricing() {
                       </div>
 
                       <div className="min-w-0 flex flex-col justify-center">
-<div className="text-base  mt-0.5 sm:text-lg font-bold text-white whitespace-nowrap">{p.name}</div>
+                        <div className="text-base mt-0.5 sm:text-lg font-bold text-white whitespace-nowrap">{p.name}</div>
 
-                        <div className="mt-2">
+                        <div className="mt-3 sm:mt-2">
                           <MiniSavingsPopover
                             prices={p.prices}
                             planName={p.name}
@@ -656,7 +650,7 @@ export default function Pricing() {
                       </div>
                     </div>
 
-                    <div className="text-right shrink-0 relative">
+                    <div className="sm:text-right shrink-0 relative sm:ml-auto mt-2 sm:mt-0">
                       <div className="text-3xl sm:text-4xl font-bold leading-none">
                         <span className="bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity">
                           {formatPrice(price)}
@@ -690,7 +684,7 @@ export default function Pricing() {
                     </div>
                   </div>
 
-                  <div className="mt-12 flex-1">
+                  <div className="mt-13 flex-1">
                     <div className="text-sm font-semibold text-slate-100">Enthalten</div>
                     <ul className="mt-3 space-y-2.5">
                       {p.features.map((f) => (
@@ -716,9 +710,9 @@ export default function Pricing() {
 
                   <div className="mt-auto pt-7">
                     {p.cta.variant === "primary" ? (
-                      <PrimaryButton href={p.cta.href}>{p.cta.label}</PrimaryButton>
+                      <PrimaryButton href={payHref}>{p.cta.label}</PrimaryButton>
                     ) : (
-                      <SecondaryButton href={p.cta.href}>{p.cta.label}</SecondaryButton>
+                      <SecondaryButton href={payHref}>{p.cta.label}</SecondaryButton>
                     )}
 
                     <p className="mt-4 text-xs text-slate-400">{cancelText(billing)}</p>
