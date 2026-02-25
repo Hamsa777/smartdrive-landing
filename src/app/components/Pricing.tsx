@@ -443,7 +443,7 @@ function MiniSavingsPopover({
                       <div>
                         <div className="text-[11px] text-slate-200 mb-1">Wert pro Stunde (€)</div>
                         <SmallStepper value={valuePerHour} onChange={setValuePerHour} min={0} max={250} step={5} />
-                        <div className="mt-1 text-[10px] text-slate-500">Tipp: konservativ starten (z.B. 50–70€).</div>
+                        <div className="mt-1 text-[10px] text-slate-500">Typisch: 60–80€</div>
                       </div>
                     </div>
 
@@ -502,7 +502,7 @@ function MiniSavingsPopover({
 
 export default function Pricing() {
   const [billing, setBilling] = useState<Billing>("monthly");
-  const [instructors, setInstructors] = useState<number>(3);
+  const [instructors, setInstructors] = useState<number>(1);
   const [openCalc, setOpenCalc] = useState<boolean>(false);
 
   const cost = useMemo(() => totalCost(billing, instructors), [billing, instructors]);
