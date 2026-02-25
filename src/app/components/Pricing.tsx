@@ -1,112 +1,116 @@
+// src/app/components/Pricing.tsx
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
-import { FaCheckCircle, FaComments, FaBolt, FaCrown, FaRocket, FaCalculator } from "react-icons/fa";
+import { FaCheckCircle, FaComments, FaBolt, FaCalculator } from "react-icons/fa";
 
 const fadeUp = { hidden: { opacity: 0, y: 26 }, visible: { opacity: 1, y: 0 } };
 
 const CAL_LINK = "https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung";
 
+/** ✅ TODO: Deine Stripe Payment Links (ein Produkt, 3 Intervalle) */
 type Billing = "weekly" | "monthly" | "yearly";
-
-type Plan = {
-  key: "A" | "B" | "C";
-  name: string;
-  icon: React.ReactNode;
-  prices: Record<Billing, number>;
-  highlight?: boolean;
-  features: string[];
-  limitations: string[];
-  // ✅ 3 Zahlungslinks pro Plan (weekly/monthly/yearly)
-  cta: { label: string; hrefs: Record<Billing, string>; variant: "primary" | "secondary" };
+const PAY_LINKS: Record<Billing, string> = {
+  weekly: "#",
+  monthly: "#",
+  yearly: "#",
 };
 
-const plans: Plan[] = [
-  {
-    key: "A",
-    name: "SmartDrive Core",
-    icon: <FaBolt className="text-cyan-200" />,
-    prices: { weekly: 29, monthly: 99, yearly: 1049 },
-    features: [
-      "Automatische Wochenplan-Erstellung",
-      "Priorisierung unflexibler Schüler",
-      "Fahrzeug- und Standortwechsel werden minimiert",
-      "Max. 2 Termine pro Schüler / Woche",
-      "Automatisierter Whatsapp-Versand an Fahrlehrer",
-      "Sperrzeiten für Fahrlehrer definierbar",
-      "Liste mit ungeplanten Schülern",
-    ],
-    limitations: [
-      "Mehrfache Planberechnung",
-      "Unbegrenzte Termine pro Schüler / Woche",
-      "Automatisierter WhatsApp-Versand an Fahrschüler",
-      "Pausen-Regeln zwischen Fahrstunden",
-      "Planung an Wochenenden",
-      "Begründungen für nicht geplante Schüler",
-    ],
-    cta: {
-      label: "Weiter zur Zahlung",
-      hrefs: {
-        weekly: "https://buy.stripe.com/cNi3cv3QC3a87GQ5W37bW0a",
-        monthly: "https://buy.stripe.com/4gM7sL4UGbGE9OYacj7bW09",
-        yearly: "https://buy.stripe.com/cNicN59aW6mk5yIckr7bW0b",
-      },
-      variant: "secondary",
-    },
-  },
-  {
-    key: "B",
-    name: "SmartDrive Pro",
-    icon: <FaRocket className="text-cyan-200" />,
-    prices: { weekly: 39, monthly: 129, yearly: 1299 },
-    highlight: true,
-    features: [
-      "Alles aus Core",
-      "Max. 3 Termine pro Schüler / Woche",
-      "Pausen zwischen jeder Fahrstunde konfigurierbar",
-      "Planung an Wochenenden möglich",
-    ],
-    limitations: [
-      "Mehrfache Planberechnung",
-      "Unbegrenzte Termine pro Schüler / Woche",
-      "Automatisierter WhatsApp-Versand an Fahrschüler",
-      "Begründungen für geplante und nicht geplante Schüler",
-    ],
-    cta: {
-      label: "Weiter zur Zahlung",
-      hrefs: {
-        weekly: "https://buy.stripe.com/5kQ3cv0Eq7qof9ibgn7bW0c",
-        monthly: "https://buy.stripe.com/8x29AT5YKh0YaT2esz7bW0d",
-        yearly: "https://buy.stripe.com/6oU7sLaf09yw7GQbgn7bW0e",
-      },
-      variant: "secondary",
-    },
-  },
-  {
-    key: "C",
-    name: "SmartDrive Ultimate",
-    icon: <FaCrown className="text-cyan-200" />,
-    prices: { weekly: 59, monthly: 159, yearly: 1599 },
-    features: [
-      "Alles aus Pro",
-      "Mehrfache Planberechnung und Auswahl des besten Plans",
-      "Automatisierter WhatsApp-Versand an alle Fahrschüler",
-      "Unbegrenzte Termine pro Schüler / Woche",
-      "Begründungen für geplante und nicht geplante Schüler einsehbar",
-    ],
-    limitations: [],
-    cta: {
-      label: "Weiter zur Zahlung",
-      hrefs: {
-        weekly: "https://buy.stripe.com/aFa5kDaf09yw9OY84b7bW0f",
-        monthly: "https://buy.stripe.com/cNiaEXaf0h0Y5yIesz7bW0g",
-        yearly: "https://buy.stripe.com/4gM7sLfzkh0Y8KU5W37bW0h",
-      },
-      variant: "secondary",
-    },
-  },
-];
+/* ============================================================
+   Pricing: 1 Paket
+   - 49€ / Monat für 1 Fahrlehrer
+   - jeder weitere Fahrlehrer: +25€ / Monat
+   - Weekly / Yearly werden sinnvoll umgerechnet
+   ============================================================ */
+
+const BASE_MONTHLY = 49;
+const ADDON_MONTHLY = 25;
+
+// realistische Umrechnung: weekly etwas teurer (Flex), yearly mit Rabatt
+const BASE_WEEKLY = 14;
+const BASE_YEARLY = 499;
+
+function billingSuffix(billing: Billing) {
+  if (billing === "weekly") return " / Woche";
+  if (billing === "yearly") return " / Jahr";
+  return " / Monat";
+}
+
+function unitWord(billing: Billing) {
+  if (billing === "weekly") return "Woche";
+  if (billing === "yearly") return "Jahr";
+  return "Monat";
+}
+
+function cancelText(billing: Billing) {
+  if (billing === "weekly") return "Einmalig 99€ Einrichtungsgebühr | Wöchentlich kündbar";
+  if (billing === "monthly") return "Einmalig 99€ Einrichtungsgebühr | Monatlich kündbar";
+  return "Einrichtungsgebühr entfällt | Jährliche Abrechnung";
+}
+
+function formatPrice(n: number) {
+  return `${Math.round(n)}€`;
+}
+
+function formatEUR(value: number) {
+  return value.toLocaleString("de-DE", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
+function clamp(n: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, n));
+}
+
+function basePriceForBilling(billing: Billing) {
+  if (billing === "weekly") return BASE_WEEKLY;
+  if (billing === "yearly") return BASE_YEARLY;
+  return BASE_MONTHLY;
+}
+
+function addonPriceForBilling(billing: Billing) {
+  if (billing === "monthly") return ADDON_MONTHLY;
+
+  // skaliere Add-on proportional zum Basisverhältnis
+  const weeklyRatio = BASE_WEEKLY / BASE_MONTHLY;
+  const yearlyRatio = BASE_YEARLY / (BASE_MONTHLY * 12);
+
+  if (billing === "weekly") return Math.max(1, Math.round(ADDON_MONTHLY * weeklyRatio));
+  return Math.max(10, Math.round(ADDON_MONTHLY * 12 * yearlyRatio));
+}
+
+function totalCost(billing: Billing, instructors: number) {
+  const ins = clamp(Math.round(instructors || 1), 1, 60);
+  const base = basePriceForBilling(billing);
+  const addon = addonPriceForBilling(billing);
+  const total = base + Math.max(0, ins - 1) * addon;
+  return { ins, base, addon, total };
+}
+
+function savingsPctMonthlyVsWeekly(ins: number) {
+  const weekly = totalCost("weekly", ins).total;
+  const weeklyAsMonth = weekly * (52 / 12);
+  const monthly = totalCost("monthly", ins).total;
+  const raw = (1 - monthly / Math.max(1, weeklyAsMonth)) * 100;
+  return Math.max(0, Math.round(raw));
+}
+
+function savingsPctYearlyVsWeekly(ins: number) {
+  const weekly = totalCost("weekly", ins).total;
+  const weeklyAsYear = weekly * 52;
+  const yearly = totalCost("yearly", ins).total;
+  const raw = (1 - yearly / Math.max(1, weeklyAsYear)) * 100;
+  return Math.max(0, Math.round(raw));
+}
+
+/* ============================================================
+   UI Buttons
+   ============================================================ */
 
 function PrimaryButton({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -115,17 +119,19 @@ function PrimaryButton({ href, children }: { href: string; children: React.React
       target="_blank"
       rel="noopener noreferrer"
       className="
-        relative group inline-flex items-center justify-center rounded-full
+        relative group inline-flex w-full sm:w-auto items-center justify-center rounded-full
         bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4]
         p-[2px]
-        shadow-[0_0_30px_rgba(79,70,229,0.85)]
-        hover:shadow-[0_0_40px_rgba(79,70,229,1)]
+        shadow-[0_0_22px_rgba(79,70,229,0.65)]
+        hover:shadow-[0_0_30px_rgba(79,70,229,0.9)]
         transition-shadow overflow-hidden
+        sm:min-w-[240px]
       "
     >
       <span
         className="
-          relative flex items-center gap-2 sm:gap-3 px-7 sm:px-9 py-2.5 sm:py-3
+          relative inline-flex w-full items-center justify-center gap-2 sm:gap-3
+          px-7 sm:px-9 py-3
           rounded-full bg-[#020617] text-sm sm:text-base font-semibold text-white
         "
       >
@@ -161,7 +167,7 @@ function SavingsButton({ onClick, pressed }: { onClick: () => void; pressed?: bo
       type="button"
       onClick={onClick}
       className={[
-        "relative inline-flex items-center justify-center rounded-full overflow-hidden",
+        "group relative inline-flex items-center justify-center rounded-full overflow-hidden",
         "px-3.5 py-1.5",
         "text-[11px] font-extrabold tracking-[0.22em] uppercase",
         "border border-slate-700/70 bg-slate-950/70 text-slate-100 backdrop-blur",
@@ -202,16 +208,6 @@ function SavingsButton({ onClick, pressed }: { onClick: () => void; pressed?: bo
   );
 }
 
-function formatPrice(n: number) {
-  return `${n}€`;
-}
-
-function billingSuffix(billing: Billing) {
-  if (billing === "weekly") return " / Woche";
-  if (billing === "yearly") return " / Jahr";
-  return " / Monat";
-}
-
 function BillingToggle({ billing, setBilling }: { billing: Billing; setBilling: (b: Billing) => void }) {
   const items: { key: Billing; label: string }[] = [
     { key: "weekly", label: "Wöchntl" },
@@ -232,7 +228,7 @@ function BillingToggle({ billing, setBilling }: { billing: Billing; setBilling: 
 
         <motion.span
           layout
-          layoutId="billing-pill"
+          layoutId="billing-pill-single"
           className="
             absolute top-1 bottom-1
             rounded-full
@@ -276,29 +272,6 @@ function BillingToggle({ billing, setBilling }: { billing: Billing; setBilling: 
   );
 }
 
-function cancelText(billing: Billing) {
-  if (billing === "weekly") return "Wöchentlich kündbar";
-  if (billing === "monthly") return "Monatlich kündbar";
-  return "Jährliche Abrechnung";
-}
-
-/* ============================================================
-   Mini-Sparrechner (Popover)
-   ============================================================ */
-
-function formatEUR(value: number) {
-  return value.toLocaleString("de-DE", {
-    style: "currency",
-    currency: "EUR",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-}
-
-function clamp(n: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, n));
-}
-
 function SmallStepper({
   value,
   onChange,
@@ -332,7 +305,11 @@ function SmallStepper({
             else onChange(min);
           }}
           inputMode="numeric"
-          className="w-full rounded-[0.75rem] bg-[#0b1224] px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none"
+          className="
+            w-full rounded-[0.75rem] bg-[#0b1224] px-3 py-2 text-sm text-white
+            placeholder:text-slate-400 focus:outline-none
+            text-center tabular-nums
+          "
         />
       </div>
 
@@ -348,38 +325,32 @@ function SmallStepper({
   );
 }
 
-type Period = Billing;
-
-function savingsPercentForPlan(planName: string) {
-  const n = planName.toLowerCase();
-  if (n.includes("core")) return 80;
-  if (n.includes("pro")) return 90;
-  return 100;
-}
+/* ============================================================
+   Sparrechner Overlay Modal (immer 100%)
+   ============================================================ */
 
 function MiniSavingsPopover({
-  prices,
-  planName,
+  billing,
+  setBilling,
+  instructors,
+  setInstructors,
   open,
   onOpen,
   onClose,
 }: {
-  prices: Record<Billing, number>;
-  planName: string;
+  billing: Billing;
+  setBilling: (b: Billing) => void;
+  instructors: number;
+  setInstructors: (n: number) => void;
   open: boolean;
   onOpen: () => void;
   onClose: () => void;
 }) {
-  const [period, setPeriod] = useState<Period>("monthly");
-  const [instructors, setInstructors] = useState<number>(5);
   const [hoursPerWeekPerInstructor, setHoursPerWeekPerInstructor] = useState<number>(2);
   const [valuePerHour, setValuePerHour] = useState<number>(80);
 
-  const percent = savingsPercentForPlan(planName);
-  const factor = percent / 100;
-
   const calc = useMemo(() => {
-    const ins = Math.max(1, instructors);
+    const ins = clamp(Math.round(instructors || 1), 1, 60);
     const h = Math.max(0, hoursPerWeekPerInstructor);
     const v = Math.max(0, valuePerHour);
 
@@ -387,172 +358,173 @@ function MiniSavingsPopover({
     const savedHoursMonth = savedHoursWeek * (52 / 12);
     const savedHoursYear = savedHoursWeek * 52;
 
-    const baseSavedValueWeek = savedHoursWeek * v;
-    const baseSavedValueMonth = savedHoursMonth * v;
-    const baseSavedValueYear = savedHoursYear * v;
+    const savedValueWeek = savedHoursWeek * v;
+    const savedValueMonth = savedHoursMonth * v;
+    const savedValueYear = savedHoursYear * v;
 
-    const savedValueWeek = baseSavedValueWeek * factor;
-    const savedValueMonth = baseSavedValueMonth * factor;
-    const savedValueYear = baseSavedValueYear * factor;
-
-    const cost = (prices[period] || 0) * ins;
-
-    const saved = period === "weekly" ? savedValueWeek : period === "monthly" ? savedValueMonth : savedValueYear;
+    const cost = totalCost(billing, ins).total;
+    const saved = billing === "weekly" ? savedValueWeek : billing === "monthly" ? savedValueMonth : savedValueYear;
 
     return { ins, savedHoursWeek, saved, cost, net: saved - cost };
-  }, [period, instructors, hoursPerWeekPerInstructor, valuePerHour, prices, factor]);
+  }, [billing, instructors, hoursPerWeekPerInstructor, valuePerHour]);
+
+  const modal =
+    open && typeof document !== "undefined"
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center px-4 py-8"
+            onMouseDown={(e) => {
+              if (e.target === e.currentTarget) onClose();
+            }}
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+            <div
+              className="relative w-full max-w-[420px]"
+              onMouseDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="rounded-3xl p-[1px] bg-gradient-to-br from-cyan-400/30 via-slate-800 to-indigo-500/30 shadow-[0_0_75px_rgba(0,0,0,0.75)]">
+                <div className="relative rounded-3xl bg-[#01040f] backdrop-blur-2xl border border-slate-800/90 overflow-hidden">
+                  <div className="absolute inset-x-6 top-0 h-[3px] bg-gradient-to-r from-cyan-400 via-indigo-400 to-sky-500 opacity-70" />
+                  <div className="pointer-events-none absolute inset-0 opacity-[0.16] bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.25),transparent_60%),radial-gradient(circle_at_bottom,_rgba(79,70,229,0.25),transparent_60%)]" />
+
+                  <div className="relative p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <div className="text-white font-semibold text-sm">Sparrechner</div>
+                        <div className="text-[11px] text-slate-400">Rechnet konservativ mit 100% der Zeitersparnis.</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={onClose}
+                        className="text-slate-300 hover:text-white text-sm px-2"
+                        aria-label="Schließen"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-3 gap-2">
+                      {(["weekly", "monthly", "yearly"] as Billing[]).map((p) => (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setBilling(p)}
+                          className={[
+                            "rounded-xl border px-3 py-2 text-xs font-semibold transition-colors",
+                            billing === p
+                              ? "border-cyan-400/40 bg-cyan-500/10 text-white"
+                              : "border-slate-700/70 bg-slate-950/50 text-slate-200 hover:bg-slate-900/60",
+                          ].join(" ")}
+                        >
+                          {p === "weekly" ? "Woche" : p === "monthly" ? "Monat" : "Jahr"}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <div className="text-[11px] text-slate-200 mb-1">Anzahl Fahrlehrer</div>
+                        <SmallStepper value={instructors} onChange={setInstructors} min={1} max={60} step={1} />
+                      </div>
+
+                      <div>
+                        <div className="text-[11px] text-slate-200 mb-1">Planungszeit pro Fahrlehrer / Woche</div>
+                        <SmallStepper
+                          value={hoursPerWeekPerInstructor}
+                          onChange={setHoursPerWeekPerInstructor}
+                          min={0}
+                          max={20}
+                          step={1}
+                        />
+                      </div>
+
+                      <div>
+                        <div className="text-[11px] text-slate-200 mb-1">Wert pro Stunde (€)</div>
+                        <SmallStepper value={valuePerHour} onChange={setValuePerHour} min={0} max={250} step={5} />
+                        <div className="mt-1 text-[10px] text-slate-500">Tipp: konservativ starten (z.B. 50–70€).</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4">
+                      <div className="text-[11px] tracking-[0.22em] uppercase text-emerald-100/90">Ergebnis</div>
+
+                      <div className="mt-2 space-y-1 text-sm">
+                        <div className="flex items-center justify-between text-slate-200">
+                          <span>Ersparnis</span>
+                          <span className="text-white font-semibold">{formatEUR(calc.saved)}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between text-slate-200">
+                          <span>SmartDrive Kosten</span>
+                          <span className="text-white font-semibold">{formatEUR(calc.cost)}</span>
+                        </div>
+
+                        <div className="mt-2 h-px bg-slate-800/80" />
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-200 font-semibold">Netto-Vorteil</span>
+                          <span className={["font-bold", calc.net >= 0 ? "text-emerald-200" : "text-rose-200"].join(" ")}>
+                            {formatEUR(calc.net)}
+                          </span>
+                        </div>
+
+                        <div className="mt-2 text-[11px] text-slate-400">
+                          Basis: {calc.ins} Fahrlehrer · ~{Math.round(calc.savedHoursWeek)}h Planungszeit/Woche gespart
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 text-[11px] text-slate-500">
+                      Hinweis: Ergebnis ist eine Schätzung und hängt von Verfügbarkeit & Regeln ab.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
 
   return (
     <div className="relative inline-block">
       <SavingsButton onClick={() => (open ? onClose() : onOpen())} pressed={open} />
-
-      {open && (
-        <div className="absolute left-0 top-full mt-3 w-[340px] sm:w-[380px] z-50">
-          <div className="rounded-3xl p-[1px] bg-gradient-to-br from-cyan-400/30 via-slate-800 to-indigo-500/30 shadow-[0_0_55px_rgba(15,23,42,0.9)]">
-            <div className="relative rounded-3xl bg-[#01040f] backdrop-blur-2xl border border-slate-800/90 overflow-hidden">
-              <div className="absolute inset-x-6 top-0 h-[3px] bg-gradient-to-r from-cyan-400 via-indigo-400 to-sky-500 opacity-70" />
-              <div className="pointer-events-none absolute inset-0 opacity-[0.16] bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.25),transparent_60%),radial-gradient(circle_at_bottom,_rgba(79,70,229,0.25),transparent_60%)]" />
-
-              <div className="relative p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-white font-semibold text-sm">Sparrechner für {planName}</div>
-                    <div className="text-[11px] text-slate-400">Schätzung basierend auf Ihren Angaben</div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="text-slate-300 hover:text-white text-sm px-2"
-                    aria-label="Schließen"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  {(["weekly", "monthly", "yearly"] as Period[]).map((p) => (
-                    <button
-                      key={p}
-                      type="button"
-                      onClick={() => setPeriod(p)}
-                      className={[
-                        "rounded-xl border px-3 py-2 text-xs font-semibold transition-colors",
-                        period === p
-                          ? "border-cyan-400/40 bg-cyan-500/10 text-white"
-                          : "border-slate-700/70 bg-slate-950/50 text-slate-200 hover:bg-slate-900/60",
-                      ].join(" ")}
-                    >
-                      {p === "weekly" ? "Woche" : p === "monthly" ? "Monat" : "Jahr"}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="mt-4 space-y-3">
-                  <div>
-                    <div className="text-[11px] text-slate-200 mb-1">Anzahl Fahrlehrer</div>
-                    <SmallStepper value={instructors} onChange={setInstructors} min={1} max={60} step={1} />
-                  </div>
-                  <div>
-                    <div className="text-[11px] text-slate-200 mb-1">Planungszeit pro Fahrlehrer / Woche</div>
-                    <SmallStepper
-                      value={hoursPerWeekPerInstructor}
-                      onChange={setHoursPerWeekPerInstructor}
-                      min={0}
-                      max={20}
-                      step={1}
-                    />
-                  </div>
-                  <div>
-                    <div className="text-[11px] text-slate-200 mb-1">Wert pro Stunde (€)</div>
-                    <SmallStepper value={valuePerHour} onChange={setValuePerHour} min={0} max={250} step={5} />
-                    <div className="mt-1 text-[10px] text-slate-500">Tipp: konservativ starten (z.B. 50–70€).</div>
-                  </div>
-                </div>
-
-                <div className="mt-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4">
-                  <div className="text-[11px] tracking-[0.22em] uppercase text-emerald-100/90">Ergebnis</div>
-
-                  <div className="mt-2 space-y-1 text-sm">
-                    <div className="flex items-center justify-between text-slate-200">
-                      <span className="inline-flex items-center gap-2">
-                        Ersparnis <span className="text-[11px] font-semibold text-cyan-200/90">({percent}%)</span>
-                      </span>
-                      <span className="text-white font-semibold">{formatEUR(calc.saved)}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between text-slate-200">
-                      <span>{planName} Kosten</span>
-                      <span className="text-white font-semibold">{formatEUR(calc.cost)}</span>
-                    </div>
-
-                    <div className="mt-2 h-px bg-slate-800/80" />
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-200 font-semibold">Netto-Vorteil</span>
-                      <span className={["font-bold", calc.net >= 0 ? "text-emerald-200" : "text-rose-200"].join(" ")}>
-                        {formatEUR(calc.net)}
-                      </span>
-                    </div>
-
-                    <div className="mt-2 text-[11px] text-slate-400">
-                      Basis: {calc.ins} Fahrlehrer · ~{Math.round(calc.savedHoursWeek)}h Planungszeit/Woche gespart
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-3 text-[11px] text-slate-500">
-                  Hinweis: Ergebnis ist eine Schätzung und hängt von Verfügbarkeit & Regeln ab.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {modal}
     </div>
   );
 }
 
 /* ============================================================
-   Pricing
+   Pricing (1 Card)
    ============================================================ */
 
 export default function Pricing() {
   const [billing, setBilling] = useState<Billing>("monthly");
-  const [openPopoverKey, setOpenPopoverKey] = useState<Plan["key"] | null>(null);
+  const [instructors, setInstructors] = useState<number>(3);
+  const [openCalc, setOpenCalc] = useState<boolean>(false);
 
-  function roundDiscountPercent(n: number) {
-    return Math.round(n);
-  }
-
-  function discountFromWeekly(prices: Record<Billing, number>, billing: Billing) {
-    if (billing === "weekly") return null;
-
-    const weekly = prices.weekly;
-    const chosen = prices[billing];
-
-    if (!weekly || weekly <= 0 || !chosen || chosen <= 0) return null;
-
-    const yearlyFromWeekly = weekly * 52;
-    const equivalent = billing === "monthly" ? yearlyFromWeekly / 12 : yearlyFromWeekly;
-
-    const raw = (1 - chosen / equivalent) * 100;
-    const pct = roundDiscountPercent(raw);
-
-    if (pct <= 0) return null;
-    return pct;
-  }
+  const cost = useMemo(() => totalCost(billing, instructors), [billing, instructors]);
+  const payHref = PAY_LINKS[billing] || PAY_LINKS.monthly;
 
   const headerNote = useMemo(() => {
-    if (billing === "yearly") return "Jährliche Abrechnung pro Fahrlehrer.";
-    if (billing === "weekly") return "Wöchentliche Abrechnung pro Fahrlehrer.";
-    return "Monatliche Abrechnung pro Fahrlehrer.";
+    return `${billing === "weekly" ? "Wöchentliche" : billing === "yearly" ? "Jährliche" : "Monatliche"} Abrechnung pro Fahrlehrer.`;
   }, [billing]);
+
+  const perInstructorAvg = cost.total / cost.ins;
+
+  const monthlyVsWeeklyPct = useMemo(() => savingsPctMonthlyVsWeekly(cost.ins), [cost.ins]);
+  const weeklyAsMonth = useMemo(() => totalCost("weekly", cost.ins).total * (52 / 12), [cost.ins]);
+
+  const yearlyVsWeeklyPct = useMemo(() => savingsPctYearlyVsWeekly(cost.ins), [cost.ins]);
+  const weeklyAsYear = useMemo(() => totalCost("weekly", cost.ins).total * 52, [cost.ins]);
 
   return (
     <section
       id="preise"
       className="
-        relative py-20 sm:pt-22 sm:py-10 px-6 sm:px-6
+        relative py-20 sm:py-24 px-6 sm:px-8
         flex justify-center
         scroll-mt-[40vh]
         overflow-hidden
@@ -573,19 +545,19 @@ export default function Pricing() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.35 }}
           transition={{ duration: 0.6 }}
-          className="mx-auto max-w-5xl text-center"
+          className="mx-auto max-w-6xl text-center"
         >
           <div className="flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-slate-950/80 px-4 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(52,211,153,0.9)]" />
-              <span className="text-[0.65rem] tracking-[0.28em] uppercase text-slate-200">Unsere Preise</span>
+              <span className="text-[0.65rem] tracking-[0.28em] uppercase text-slate-200">Preise</span>
             </div>
           </div>
 
           <h1 className="mt-5 text-3xl sm:text-4xl md:text-5xl font-bold text-white">
-            Wählen Sie Ihr{" "}
+            Unser{" "}
             <span className="bg-gradient-to-r from-indigo-300 via-cyan-300 to-sky-400 bg-clip-text text-transparent">
-              SmartDrive
+              Angebot
             </span>
           </h1>
 
@@ -594,135 +566,172 @@ export default function Pricing() {
           <BillingToggle billing={billing} setBilling={setBilling} />
         </motion.div>
 
-        <div className="relative mt-12 grid gap-6 lg:grid-cols-3 items-stretch">
-          {plans.map((p, idx) => {
-            const price = p.prices[billing];
-            const suffix = billingSuffix(billing);
-            const isOpen = openPopoverKey === p.key;
-            const payHref = p.cta.hrefs[billing] || p.cta.hrefs.monthly;
+        <div className="mt-12 flex justify-center">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            transition={{ duration: 0.55 }}
+            className="
+              relative isolate group w-full max-w-6xl
+              rounded-[1.8rem] border border-cyan-400/30
+              bg-slate-950/80 backdrop-blur-2xl
+              shadow-[0_0_55px_rgba(15,23,42,0.88)]
+            "
+          >
+            <div className="pointer-events-none absolute inset-[1px] rounded-[1.7rem] border border-slate-800/70" />
+            <div className="absolute inset-x-10 top-0 h-[3px] bg-gradient-to-r from-cyan-400 via-indigo-400 to-sky-500" />
 
-            return (
-              <motion.div
-                key={p.key}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{ duration: 0.55, delay: idx * 0.04 }}
-                className={[
-                  "relative isolate group rounded-[1.8rem] border bg-slate-950/80 backdrop-blur-2xl",
-                  "min-h-[820px] sm:min-h-0",
-                  isOpen ? "z-30" : "z-10",
-                  p.highlight
-                    ? "border-cyan-400/40 shadow-[0_0_40px_rgba(56,189,248,0.18)]"
-                    : "border-slate-800/90 shadow-[0_0_45px_rgba(15,23,42,0.85)]",
-                ].join(" ")}
-              >
-                <div className="pointer-events-none absolute inset-[1px] rounded-[1.7rem] border border-slate-800/70" />
-                <div className="absolute inset-x-8 top-0 h-[3px] bg-gradient-to-r from-cyan-400 via-indigo-400 to-sky-500" />
-
-                <div className="relative p-6 sm:p-7 flex flex-col h-full">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <div className="relative">
-                        <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-gradient-to-r from-indigo-500/22 via-cyan-400/18 to-sky-500/22 blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
-
-                        <div className="relative rounded-3xl p-[2px] bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4]">
-                          <div className="relative w-12 h-12 rounded-3xl bg-[#020617] border border-slate-800/70 flex items-center justify-center shadow-[0_0_22px_rgba(79,70,229,0.28)] group-hover:shadow-[0_0_30px_rgba(56,189,248,0.34)] transition-shadow">
-                            <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_30%_30%,rgba(56,189,248,0.14),transparent_62%)] opacity-80" />
-                            <span className="relative text-cyan-200 text-base">{p.icon}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="min-w-0 flex flex-col justify-center">
-                        <div className="text-base mt-0.5 sm:text-lg font-bold text-white whitespace-nowrap">{p.name}</div>
-
-                        <div className="mt-3 sm:mt-2">
-                          <MiniSavingsPopover
-                            prices={p.prices}
-                            planName={p.name}
-                            open={isOpen}
-                            onOpen={() => setOpenPopoverKey(p.key)}
-                            onClose={() => setOpenPopoverKey(null)}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="sm:text-right shrink-0 relative sm:ml-auto mt-2 sm:mt-0">
-                      <div className="text-3xl sm:text-4xl font-bold leading-none">
-                        <span className="bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity">
-                          {formatPrice(price)}
+            <div className="relative p-6 sm:p-10">
+              {/* ✅ Mobile: alles mittig / Desktop: normal links+rechts */}
+              <div className="flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left lg:justify-between gap-8">
+                {/* Left */}
+                <div className="flex flex-col items-center text-center lg:flex-row lg:items-start lg:text-left gap-4 min-w-0 flex-1">
+                  <div className="relative mt-1">
+                    <div className="pointer-events-none absolute -inset-2 rounded-3xl bg-gradient-to-r from-indigo-500/22 via-cyan-400/18 to-sky-500/22 blur-xl opacity-60 group-hover:opacity-90 transition-opacity" />
+                    <div className="relative rounded-3xl p-[2px] bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4]">
+                      <div className="relative w-12 h-12 rounded-3xl bg-[#020617] border border-slate-800/70 flex items-center justify-center shadow-[0_0_22px_rgba(79,70,229,0.28)] group-hover:shadow-[0_0_30px_rgba(56,189,248,0.34)] transition-shadow">
+                        <div className="pointer-events-none absolute inset-0 rounded-3xl bg-[radial-gradient(circle_at_30%_30%,rgba(56,189,248,0.14),transparent_62%)] opacity-80" />
+                        <span className="relative text-cyan-200 text-base">
+                          <FaBolt className="text-cyan-200" />
                         </span>
                       </div>
-
-                      <div className="text-xs text-slate-400 mt-2">pro Fahrlehrer{suffix}</div>
-
-                      {billing !== "weekly"
-                        ? (() => {
-                            const discountPct = discountFromWeekly(p.prices, billing);
-                            if (discountPct === null) return null;
-
-                            const old =
-                              billing === "monthly" ? (p.prices.weekly * 52) / 12 : p.prices.weekly * 52;
-
-                            return (
-                              <div className="absolute right-0 top-full mt-2 z-10 flex items-center gap-2 leading-none">
-                                <div className="relative inline-flex items-center rounded-full border border-emerald-400/30 bg-slate-950/80 backdrop-blur px-2.5 py-1 overflow-hidden">
-                                  <span className="absolute inset-0 bg-gradient-to-r from-emerald-100/10 via-lime-100/10 to-emerald-100/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                  <span className="text-[0.65rem] tracking-[0.22em] uppercase bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity drop-shadow-[0_0_10px_rgba(163,230,53,0.25)] group-hover:drop-shadow-[0_0_14px_rgba(163,230,53,0.45)] transition-[filter,opacity]">
-                                    -{discountPct}%
-                                  </span>
-                                </div>
-
-                                <span className="text-xs text-slate-400 line-through">{formatPrice(Math.round(old))}</span>
-                              </div>
-                            );
-                          })()
-                        : null}
                     </div>
                   </div>
 
-                  <div className="mt-13 flex-1">
-                    <div className="text-sm font-semibold text-slate-100">Enthalten</div>
-                    <ul className="mt-3 space-y-2.5">
-                      {p.features.map((f) => (
-                        <li key={f} className="flex gap-2.5 text-sm text-slate-200/90">
-                          <FaCheckCircle className="w-4 h-4 flex-none mt-[2px] text-cyan-300/90" />
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-lg sm:text-xl font-bold text-white">SmartDrive</div>
 
-                    <div className="mt-6 text-sm font-semibold text-slate-100">Nicht enthalten</div>
-                    <ul className="mt-3 space-y-2.5">
-                      {(p.limitations.length > 0 ? p.limitations : ["—"]).map((f, i) => (
-                        <li key={`${p.key}-lim-${i}`} className="flex gap-2.5 text-sm text-slate-300/80">
-                          <span className="w-4 h-4 flex-none mt-[3px] inline-flex items-center justify-center">
-                            <span className="h-1.5 w-1.5 rounded-full bg-slate-500/80" />
-                          </span>
-                          <span>{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                    <div className="mt-1 text-sm text-slate-300/90">
+                      <span className="text-white font-semibold">
+                        {formatPrice(cost.base)}/{unitWord(billing)}
+                      </span>{" "}
+                      für den ersten Fahrlehrer{" "}
+                      <span className="text-white font-semibold">
+                        + {formatPrice(cost.addon)}/{unitWord(billing)}
+                      </span>{" "}
+                      je weiterer Fahrlehrer
+                    </div>
 
-                  <div className="mt-auto pt-7">
-                    {p.cta.variant === "primary" ? (
-                      <PrimaryButton href={payHref}>{p.cta.label}</PrimaryButton>
-                    ) : (
-                      <SecondaryButton href={payHref}>{p.cta.label}</SecondaryButton>
-                    )}
+                    <div className="mt-5">
+                      <div className="text-[11px] tracking-[0.22em] uppercase text-slate-200/90 mb-2">
+                        Anzahl Fahrlehrer
+                      </div>
 
-                    <p className="mt-4 text-xs text-slate-400">{cancelText(billing)}</p>
+                      {/* ✅ Mobile: Ersparnis-Button mittig UNTER dem Stepper (nur Mobile)
+                          ✅ ab sm: Button wieder rechts neben dem Stepper */}
+                      <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:justify-start sm:gap-3">
+                        <div className="w-full max-w-[260px] sm:max-w-[240px] mx-auto sm:mx-0">
+                          <SmallStepper value={cost.ins} onChange={setInstructors} min={1} max={60} step={1} />
+                        </div>
+
+                        <MiniSavingsPopover
+                          billing={billing}
+                          setBilling={setBilling}
+                          instructors={instructors}
+                          setInstructors={setInstructors}
+                          open={openCalc}
+                          onOpen={() => setOpenCalc(true)}
+                          onClose={() => setOpenCalc(false)}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-            );
-          })}
+
+                {/* Right (Price) */}
+                <div className="shrink-0 w-full lg:w-auto text-center lg:text-right">
+                  <div className="text-3xl sm:text-4xl font-bold leading-none">
+                    <span className="bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent opacity-95 group-hover:opacity-100 transition-opacity">
+                      {formatPrice(cost.total)}
+                    </span>
+                  </div>
+
+                  <div className="text-xs text-slate-400 mt-2">
+                    Ø {formatPrice(perInstructorAvg)}
+                    {billingSuffix(billing)} pro Fahrlehrer
+                  </div>
+
+                  {/* ✅ monatlich: vs weekly */}
+                  {billing === "monthly" && monthlyVsWeeklyPct > 0 ? (
+                    <div className="mt-2 flex items-center justify-center gap-2 lg:justify-end">
+                      <div className="inline-flex items-center rounded-full border border-emerald-400/30 bg-slate-950/80 px-2.5 py-1">
+                        <span className="text-[0.65rem] tracking-[0.22em] uppercase bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent">
+                          Spare {monthlyVsWeeklyPct}%
+                        </span>
+                      </div>
+                      <span className="text-xs text-slate-400 line-through">{formatPrice(weeklyAsMonth)}</span>
+                    </div>
+                  ) : null}
+
+                  {/* ✅ yearly: vs weekly (nicht monatlich) */}
+                  {billing === "yearly" && yearlyVsWeeklyPct > 0 ? (
+                    <div className="mt-2 flex items-center justify-center gap-2 lg:justify-end">
+                      <div className="inline-flex items-center rounded-full border border-emerald-400/30 bg-slate-950/80 px-2.5 py-1">
+                        <span className="text-[0.65rem] tracking-[0.22em] uppercase bg-gradient-to-r from-emerald-100 via-lime-100 to-emerald-100 bg-clip-text text-transparent">
+                          Spare {yearlyVsWeeklyPct}%
+                        </span>
+                      </div>
+                      <span className="text-xs text-slate-400 line-through">{formatPrice(weeklyAsYear)}</span>
+                    </div>
+                  ) : null}
+
+                  <div className="mt-6 flex justify-center lg:justify-end">
+                    <PrimaryButton href={payHref}>Weiter zur Zahlung</PrimaryButton>
+                  </div>
+
+                  <p className="mt-3 text-xs text-slate-400 text-center lg:text-right">{cancelText(billing)}</p>
+                </div>
+              </div>
+
+              {/* Features */}
+              <div className="mt-10 grid gap-8 lg:grid-cols-2">
+                <div>
+                  <div className="text-sm font-semibold text-slate-100">Enthalten</div>
+                  <ul className="mt-3 space-y-2.5">
+                    {[
+                      "Vollautomatische Wochenplanung",
+                      "Eliminierung jeglicher Leerläufe",
+                      "Pausen-Regeln zwischen Fahrstunden",
+                      "Minimierung von Fahrzeug- & Prüfungsstadtwechseln",
+                      "WhatsApp Benachrichtigungen (Fahrlehrer)",
+                      "Mehrfache Planberechnung",
+                      "Übersicht ungeplanter Schüler",
+                    ].map((f) => (
+                      <li key={f} className="flex gap-2.5 text-sm text-slate-200/90">
+                        <FaCheckCircle className="w-4 h-4 flex-none mt-[2px] text-cyan-300/90" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="rounded-2xl border border-slate-800/80 bg-slate-950/40 p-5">
+                  <div className="text-[11px] tracking-[0.22em] uppercase text-slate-200/90">Kurz erklärt</div>
+                  <div className="mt-3 text-sm text-slate-200/90 leading-relaxed">
+                    Sie wählen einfach die Anzahl Fahrlehrer, der Preis passt sich automatisch an.
+                    <div className="mt-3 text-xs text-slate-500">
+                      {billing === "yearly" ? (
+                        <>
+                          Einrichtungsgebühr entfällt · {formatEUR(cost.base)} für den ersten Fahrlehrer · Zusatz je
+                          weiterer Fahrlehrer: {formatEUR(cost.addon)} (jährlich)
+                        </>
+                      ) : (
+                        <>
+                          99 € Einrichtungsgebühr + {formatEUR(cost.base)} für den ersten Fahrlehrer · Zusatz je
+                          weiterer Fahrlehrer: {formatEUR(cost.addon)} {billing === "weekly" ? "(wöchentlich)" : "(monatlich)"}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
 
+        {/* CTA ausserhalb der Card */}
         <div className="mt-10 flex justify-center">
           <div className="w-full max-w-xl rounded-2xl px-6 py-6 text-center">
             <div className="text-xs tracking-[0.22em] uppercase text-cyan-300/90">Noch Fragen?</div>
