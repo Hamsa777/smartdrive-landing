@@ -13,9 +13,9 @@ const CAL_LINK = "https://cal.com/ki-partner/smartdrive-vollautomatische-terminp
 /** ✅ TODO: Deine Stripe Payment Links (ein Produkt, 3 Intervalle) */
 type Billing = "weekly" | "monthly" | "yearly";
 const PAY_LINKS: Record<Billing, string> = {
-  weekly: "#",
-  monthly: "#",
-  yearly: "#",
+  weekly: "https://buy.stripe.com/28E4gzbj49yw3qA5W37bW0j",
+  monthly: "https://buy.stripe.com/fZu5kDcn88us5yI5W37bW0i",
+  yearly: "https://buy.stripe.com/9B6cN52Myh0Y7GQ4RZ7bW0k",
 };
 
 /* ============================================================
