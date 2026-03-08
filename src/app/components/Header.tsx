@@ -3,10 +3,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState, type MouseEvent } from "react";
 import { FaComments } from "react-icons/fa";
 
 export default function Header() {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -33,6 +35,18 @@ export default function Header() {
       document.body.style.overflow = prev;
     };
   }, [open]);
+
+  const handleLogoClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    setOpen(false);
+
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const headerHoverBtnClass =
     "relative group items-center justify-center rounded-full " +
@@ -81,15 +95,16 @@ export default function Header() {
           ].join(" ")}
         />
 
-
-       
-
         {/* GRID: links / mitte / rechts => Navbar exakt zentriert */}
         <div className="mx-auto max-w-7xl px-6 sm:px-8 h-16 grid grid-cols-[1fr_auto_1fr] items-center">
           {/* LEFT */}
           <div className="flex items-center justify-self-start min-w-0">
             {/* DESKTOP LOGO */}
-            <Link href="/" className="hidden md:inline-flex items-center min-w-0">
+            <Link
+              href="/"
+              onClick={handleLogoClick}
+              className="hidden md:inline-flex items-center min-w-0 cursor-pointer"
+            >
               <Image
                 src="/SmartDriveFinal.png"
                 alt="SmartDrive"
@@ -145,7 +160,11 @@ export default function Header() {
             </nav>
 
             {/* MOBILE LOGO: exakt mittig */}
-            <Link href="/" className="md:hidden inline-flex items-center justify-center">
+            <Link
+              href="/"
+              onClick={handleLogoClick}
+              className="md:hidden inline-flex items-center justify-center cursor-pointer"
+            >
               <Image
                 src="/SmartDriveFinal.png"
                 alt="SmartDrive"
