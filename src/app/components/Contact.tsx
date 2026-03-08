@@ -22,23 +22,22 @@ function SecondaryButton({
 }) {
   return (
     <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="
-        group inline-flex items-center justify-center rounded-full
-        border border-slate-500/70 bg-slate-900/60
-        px-6 py-3
-        text-sm sm:text-base font-semibold text-white
-        transition-all duration-300
-        hover:border-cyan-400/50 hover:bg-slate-900/85
-        hover:shadow-[0_0_24px_rgba(34,211,238,0.18)]
-      "
-    >
-      <span className="flex w-[320px] max-w-full items-center justify-center gap-2 sm:gap-3 text-center">
-        {children}
-      </span>
-    </a>
+  href={href}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="
+    relative group inline-flex items-center justify-center rounded-full
+    border border-slate-500/70 bg-slate-900/60
+    text-sm sm:text-base font-semibold text-slate-100
+    px-7 sm:px-8 py-2.5 sm:py-3
+    hover:bg-slate-900/80 transition-colors overflow-hidden
+  "
+>
+  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+  <span className="relative z-10 flex w-[320px] max-w-full items-center justify-center gap-2 sm:gap-3 text-center">
+    {children}
+  </span>
+</a>
   );
 }
 

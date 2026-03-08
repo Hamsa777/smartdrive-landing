@@ -10,15 +10,23 @@ const fadeUp = { hidden: { opacity: 0, y: 26 }, visible: { opacity: 1, y: 0 } };
 const faqs = [
   {
     q: "Was genau macht SmartDrive?",
-    a: "SmartDrive sammelt Verfügbarkeiten (Schüler) und Blockzeiten (Fahrlehrer), erstellt daraus den optimalen Wochenplan und versendet den Plan sowie einzelne Termine automatisch per WhatsApp.",
+    a: "SmartDrive automatisiert die Wochenplanung für Fahrschulen basierend auf Verfügbarkeiten der Fahrlehrer und Fahrschüler.",
+  },
+  {
+    q: "Wie plant SmartDrive die Fahrstunden und nach welchen Regeln?",
+    a: "SmartDrive plant anhand eines Algorithmus, der feste mathematische Regeln befolgt, bspw. Priorisierung unflexibler Schüler, unmögliche Überschneidungen von Fahrstunden, verbotene Leerlaufblöcke.",
   },
   {
     q: "Welche Daten werden beim Schüler-Onboarding abgefragt?",
-    a: "Vor- und Nachname, Telefonnummer (WhatsApp), Getriebe (Schaltung/Automatik) und Prüfungsstadt. Danach erhalten Schüler automatisch ein Formular zur wöchentlichen Eingabe ihrer Verfügbarkeit.",
+    a: "Vor- und Nachname, Getriebe (Schaltung/Automatik) und Prüfungsstadt.",
   },
   {
     q: "Welche Daten werden beim Fahrlehrer-Onboarding abgefragt?",
-    a: "Vor- und Nachname, Telefonnummer (WhatsApp), Arbeitszeiten, Anzahl Termine pro Schüler/Woche, Pausen zwischen Fahrstunden. Danach erhalten Fahrlehrer automatisch ein Formular zur wöchentlichen Eingabe ihrer Sperrzeiten.",
+    a: "Vor- und Nachname, Telefonnummer (WhatsApp), Arbeitszeiten, Stichtag für den Erhalt des Wochenplans, Planen an Wochenenden, Anzahl Termine pro Schüler/Woche, Pausen zwischen Fahrstunden.",
+  },
+  {
+    q: "Woher weiss SmartDrive, wann meine Fahrlehrer und Fahrschüler eingeplant werden können?",
+    a: "SmartDrive fragt wöchentlich über ein digitales Formular die Verfügbarkeiten der Fahrlehrer und Fahrschüler der kommenden Woche ab. Auf Basis dieser Daten erstellt SmartDrive den Wochenplan.",
   },
   {
     q: "Können wir den Planungszeitpunkt festlegen?",
@@ -26,7 +34,7 @@ const faqs = [
   },
   {
     q: "Wie schnell sind wir startklar?",
-    a: "Sobald Ihre Formulare stehen, können Sie sehr schnell live gehen: Onboarding → Verfügbarkeiten → Planlauf → WhatsApp-Versand. Anschließend wiederholt sich der Ablauf wöchentlich.",
+    a: "Sobald Sie die Formulare abgeschickt haben, können Sie sehr schnell starten: Verfügbarkeiten → Planlauf → WhatsApp-Versand. Anschließend wiederholt sich der Ablauf wöchentlich.",
   },
 ];
 

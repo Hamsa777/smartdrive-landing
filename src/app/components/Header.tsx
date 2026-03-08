@@ -76,18 +76,13 @@ export default function Header() {
         {/* Bottom-Glow-Line */}
         <div
           className={[
-            "pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] transition-opacity duration-300",
+            "pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-[#60cdff] via-[#44008c] to-[#60cdff] transition-opacity duration-300",
             scrolled ? "opacity-60" : "opacity-0",
           ].join(" ")}
         />
 
-        {/* Top Accent-Line */}
-        <div
-          className={[
-            "pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] transition-opacity duration-300",
-            scrolled ? "opacity-40" : "opacity-20",
-          ].join(" ")}
-        />
+
+       
 
         {/* GRID: links / mitte / rechts => Navbar exakt zentriert */}
         <div className="mx-auto max-w-7xl px-6 sm:px-8 h-16 grid grid-cols-[1fr_auto_1fr] items-center">
