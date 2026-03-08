@@ -181,7 +181,7 @@ export default function Header() {
           <div className="flex items-center gap-3 justify-self-end">
             {/* DESKTOP: Kontakt */}
             <a
-              href="https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung"
+              href="'https://cal.com/ki-partner/smartdrive-vollautomatische-terminplanung'"
               target="_blank"
               rel="noopener noreferrer"
               className={headerHoverBtnClass + " hidden md:inline-flex px-5 py-2"}
