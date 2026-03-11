@@ -22,22 +22,22 @@ function SecondaryButton({
 }) {
   return (
     <a
-  href={href}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="
-    relative group inline-flex items-center justify-center rounded-full
-    border border-slate-500/70 bg-slate-900/60
-    text-sm sm:text-base font-semibold text-slate-100
-    px-7 sm:px-8 py-2.5 sm:py-3
-    hover:bg-slate-900/80 transition-colors overflow-hidden
-  "
->
-  <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-  <span className="relative z-10 flex w-[320px] max-w-full items-center justify-center gap-2 sm:gap-3 text-center">
-    {children}
-  </span>
-</a>
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="
+        relative group inline-flex items-center justify-center rounded-full
+        border border-slate-500/70 bg-slate-900/60
+        text-sm sm:text-base font-semibold text-slate-100
+        px-7 sm:px-8 py-2.5 sm:py-3
+        hover:bg-slate-900/80 transition-colors overflow-hidden
+      "
+    >
+      <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#283593] via-[#4f46e5] to-[#00bcd4] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      <span className="relative z-10 flex w-[320px] max-w-full items-center justify-center gap-2 sm:gap-3 text-center">
+        {children}
+      </span>
+    </a>
   );
 }
 
@@ -62,7 +62,7 @@ export default function Contact() {
       className="
         relative py-20 px-6 sm:px-8
         flex justify-center
-        scroll-mt-[40vh]
+        scroll-mt-24 sm:scroll-mt-28
       "
     >
       <Script
@@ -80,7 +80,7 @@ export default function Contact() {
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.35 }}
+          viewport={{ once: true, amount: 0.08 }}
           transition={{ duration: 0.6 }}
         >
           {/* HEADER */}
@@ -93,7 +93,7 @@ export default function Contact() {
             </div>
 
             <h2 className="mt-5 text-3xl sm:text-4xl font-bold text-white">
-             Unser{" "}
+              Unser{" "}
               <span className="bg-gradient-to-r from-indigo-300 via-cyan-300 to-sky-400 bg-clip-text text-transparent">
                 Kontaktformular
               </span>
