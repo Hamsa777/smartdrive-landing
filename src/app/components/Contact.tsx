@@ -93,14 +93,14 @@ export default function Contact() {
             </div>
 
             <h2 className="mt-5 text-3xl sm:text-4xl font-bold text-white">
-              Unser{" "}
+              Testen Sie SmartDrive{" "}
               <span className="bg-gradient-to-r from-indigo-300 via-cyan-300 to-sky-400 bg-clip-text text-transparent">
-                Kontaktformular
+                kostenlos!
               </span>
             </h2>
 
             <p className="mt-4 text-sm sm:text-base text-slate-300/90 leading-relaxed max-w-2xl">
-              Füllen Sie das Kontaktformular aus, um SmartDrive kostenlos zu testen.
+              Füllen Sie dafür lediglich unser Kontaktformular aus.
             </p>
           </div>
 
